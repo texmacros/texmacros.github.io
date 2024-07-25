@@ -8,9 +8,11 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 50px;
+            margin: 0;
+            padding: 0;
             overflow: hidden; /* Чтобы анимация дождя не вызывала прокрутку */
-            background: #000; /* Черный фон для контраста */
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
 
         .rain {
@@ -28,7 +30,7 @@
             bottom: 100%;
             width: 2px;
             height: 100px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.3);
             animation: fall linear infinite;
         }
 
@@ -40,7 +42,7 @@
     </style>
 </head>
 <body>
-    <h1>Привет! Я тимур</h1>
+    <h1>Привет! Я [Ваше имя]</h1>
     <p>Добро пожаловать на мой сайт!</p>
     <div class="social-links">
         <a href="https://t.me/macrostex" target="_blank">Telegram</a>
@@ -57,7 +59,7 @@
         for (let i = 0; i < numberOfDrops; i++) {
             const drop = document.createElement('div');
             drop.style.left = `${Math.random() * 100}vw`;
-            drop.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
+            drop.style.animationDuration = `${1 + Math.random() * 1.5}s`; // Медленнее
             drop.style.animationDelay = `${Math.random() * 5}s`;
             rainContainer.appendChild(drop);
         }
