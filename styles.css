@@ -3,11 +3,14 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #f4f4f9;
+    background-image: url('https://github.com/texmacros/texmacros.github.io/blob/80c87ef5b46768f7b0abbd0f47b0503bd7ca1189/%23Suzuya_Juuzou%E2%99%A1.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 header {
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 10px 0;
 }
 
@@ -30,7 +33,7 @@ nav ul li a {
 }
 
 .hero-section {
-    background-color: #556b2f;
+    background-color: rgba(0, 0, 0, 0.6);
     color: white;
     padding: 60px 20px;
     text-align: center;
@@ -49,6 +52,9 @@ nav ul li a {
 .info-section {
     padding: 40px 20px;
     text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    margin: 20px 0;
+    border-radius: 10px;
 }
 
 .info-section h2 {
@@ -72,7 +78,7 @@ nav ul li a {
 }
 
 footer {
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     text-align: center;
     padding: 10px 0;
