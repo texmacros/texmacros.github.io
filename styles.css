@@ -1,92 +1,47 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: #202124;
+    text-align: center;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    background-image: url('https://github.com/texmacros/texmacros.github.io/blob/80c87ef5b46768f7b0abbd0f47b0503bd7ca1189/%23Suzuya_Juuzou%E2%99%A1.jpg');
-    background-size: cover;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    overflow: hidden;
 }
 
 header {
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 10px 0;
-}
-
-nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-}
-
-nav ul li {
-    display: inline;
-    margin: 0 15px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-.hero-section {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 60px 20px;
-    text-align: center;
-}
-
-.hero-section h1 {
-    margin: 0;
-    font-size: 36px;
-}
-
-.hero-section p {
-    font-size: 18px;
-    margin: 10px 0 0;
-}
-
-.info-section {
-    padding: 40px 20px;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.8);
-    margin: 20px 0;
-    border-radius: 10px;
-}
-
-.info-section h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-
-.card-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    max-width: 300px;
-    text-align: left;
 }
 
-footer {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
+.social-links a {
+    display: inline-block;
+    margin: 10px;
+    text-decoration: none;
+    color: #202124;
+}
+
+.social-links img {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.animated-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    bottom: 0;
+    height: 100%;
+    z-index: -1;
+    background: url('background.svg') repeat;
+    animation: bgMove 20s linear infinite;
 }
 
-footer p {
-    margin: 0;
+@keyframes bgMove {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(-100%, -100%);
+    }
 }
