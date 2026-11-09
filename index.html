@@ -10,13 +10,15 @@
     body {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 14px;
       padding: 20px;
       background: #1E1230;
       font-family: Roboto, Arial, sans-serif;
       color: #CCC2DC;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .bubbles {
@@ -43,6 +45,115 @@
       100% { transform: translate(var(--drift), calc(-100vh - 280px)); opacity: 0; }
     }
 
+    /* ---------- плеер ---------- */
+    .player {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 12px;
+      background: rgba(43, 27, 61, .85);
+      backdrop-filter: blur(6px);
+      border-radius: 999px;
+      animation: fadeUp .8s ease both;
+    }
+
+    .play-btn {
+      flex: none;
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 50%;
+      background: #D0BCFF;
+      color: #381E72;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform .2s ease;
+    }
+
+    .play-btn:active { transform: scale(.92); }
+    .play-btn svg { width: 24px; height: 24px; }
+    .play-btn .pause { display: none; }
+    .player.playing .play-btn .play { display: none; }
+    .player.playing .play-btn .pause { display: block; }
+
+    .wave {
+      position: relative;
+      flex: 1;
+      height: 32px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .wave-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .wave-bg { width: 100%; }
+    .wave-fg { width: 0%; }
+
+    .wave svg {
+      display: block;
+      animation: flow 1s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .player.playing .wave svg { animation-play-state: running; }
+
+    @keyframes flow {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-20px); }
+    }
+
+    .wave path {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .wave-bg path { stroke: rgba(208,188,255,.3); }
+    .wave-fg path { stroke: #D0BCFF; }
+
+    .cover {
+      flex: none;
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #4A3A63;
+      color: #EADDFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover svg { width: 24px; height: 24px; }
+
+    .cover img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .player.playing .cover { animation: spin 14s linear infinite; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ---------- карточка ---------- */
     .card {
       position: relative;
       z-index: 1;
@@ -99,45 +210,31 @@
     .btn:active { transform: scale(.96); }
     .btn.primary { background: #D0BCFF; color: #381E72; }
 
-    .music {
-      position: fixed;
-      right: 24px;
-      bottom: 24px;
-      z-index: 2;
-      width: 56px;
-      height: 56px;
-      border: 0;
-      border-radius: 50%;
-      background: #D0BCFF;
-      color: #381E72;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,.35);
-      transition: transform .2s ease;
-    }
-
-    .music:active { transform: scale(.92); }
-    .music svg { width: 26px; height: 26px; }
-    .music .pause { display: none; }
-    .music.playing .play { display: none; }
-    .music.playing .pause { display: block; }
-    .music.playing { animation: pulse 2s ease-in-out infinite; }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 0 rgba(208,188,255,.5); }
-      50%      { box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 12px rgba(208,188,255,0); }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .bubble, .card, .music.playing { animation: none; }
+      .bubble, .card, .player, .wave svg, .player.playing .cover { animation: none; }
       .bubble { display: none; }
     }
   </style>
 </head>
 <body>
   <div class="bubbles" id="bubbles"></div>
+
+  <div class="player" id="player">
+    <button class="play-btn" id="playBtn" aria-label="Музыка">
+      <svg class="play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+      <svg class="pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+
+    <div class="wave" id="wave">
+      <div class="wave-layer wave-bg"><svg><path/></svg></div>
+      <div class="wave-layer wave-fg" id="waveFg"><svg><path/></svg></div>
+    </div>
+
+    <div class="cover">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+      <img src="cover.jpg" alt="" onerror="this.style.display='none'">
+    </div>
+  </div>
 
   <main class="card">
     <img class="avatar" src="avatar.jpg" alt="texmacros"
@@ -161,13 +258,10 @@
     </div>
   </main>
 
-  <audio id="audio" src="music.mp3" loop preload="none"></audio>
-  <button class="music" id="music" aria-label="Музыка">
-    <svg class="play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
-    <svg class="pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-  </button>
+  <audio id="audio" src="music.mp3" loop preload="metadata"></audio>
 
   <script>
+    /* пузырьки */
     var box = document.getElementById('bubbles');
     for (var i = 0; i < 18; i++) {
       var b = document.createElement('span');
@@ -181,17 +275,54 @@
       box.appendChild(b);
     }
 
+    /* волна */
+    var wave = document.getElementById('wave');
+    var waveFg = document.getElementById('waveFg');
+    var svgs = wave.querySelectorAll('svg');
+
+    function drawWave() {
+      var W = wave.clientWidth;
+      var n = Math.ceil((W + 40) / 10) + 1;
+      var d = 'M0 16 q5 -8 10 0';
+      for (var i = 1; i < n; i++) d += ' t10 0';
+      for (var j = 0; j < svgs.length; j++) {
+        var s = svgs[j];
+        s.setAttribute('width', W + 40);
+        s.setAttribute('height', 32);
+        s.setAttribute('viewBox', '0 0 ' + (W + 40) + ' 32');
+        s.querySelector('path').setAttribute('d', d);
+      }
+    }
+    drawWave();
+    window.addEventListener('resize', drawWave);
+
+    /* плеер */
     var audio = document.getElementById('audio');
-    var btn = document.getElementById('music');
-    btn.addEventListener('click', function () {
+    var player = document.getElementById('player');
+    var playBtn = document.getElementById('playBtn');
+
+    playBtn.addEventListener('click', function () {
       if (audio.paused) {
         audio.play().then(function () {
-          btn.classList.add('playing');
+          player.classList.add('playing');
         }).catch(function () {});
       } else {
         audio.pause();
-        btn.classList.remove('playing');
+        player.classList.remove('playing');
       }
+    });
+
+    audio.addEventListener('timeupdate', function () {
+      if (audio.duration) {
+        waveFg.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      }
+    });
+
+    wave.addEventListener('click', function (e) {
+      if (!audio.duration) return;
+      var r = wave.getBoundingClientRect();
+      var ratio = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
+      audio.currentTime = ratio * audio.duration;
     });
   </script>
 </body>
