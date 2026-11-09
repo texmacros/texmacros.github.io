@@ -260,10 +260,11 @@
       font: inherit;
       font-size: 14px;
       cursor: pointer;
-      transition: transform .2s ease;
+      transition: transform .2s ease, opacity .2s ease;
     }
 
     .chip:active { transform: scale(.95); }
+    .chip:disabled { opacity: .45; cursor: default; }
 
     /* ---------- photo viewer ---------- */
     .viewer {
@@ -332,7 +333,9 @@
 
     .viewer-bar {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
+      justify-content: flex-end;
       gap: 8px;
     }
 
@@ -409,6 +412,7 @@
       </div>
       <div class="viewer-bar">
         <a class="src" id="viewerSrc" href="#" target="_blank" rel="noopener" hidden>source</a>
+        <button class="chip" id="saveBtn" disabled>save</button>
         <button class="chip" id="againBtn">next</button>
         <button class="chip" id="closeBtn">close</button>
       </div>
@@ -530,9 +534,11 @@
     var spinner = document.getElementById('spinner');
     var viewerMsg = document.getElementById('viewerMsg');
     var viewerSrc = document.getElementById('viewerSrc');
+    var saveBtn = document.getElementById('saveBtn');
     var againBtn = document.getElementById('againBtn');
     var closeBtn = document.getElementById('closeBtn');
     var currentKind = null;
+    var currentUrl = null;
     var token = 0;
 
     function pickRandom(arr) {
@@ -592,6 +598,8 @@
 
     function loadPhoto() {
       var my = ++token;
+      currentUrl = null;
+      saveBtn.disabled = true;
       viewerImg.classList.add('loading');
       spinner.hidden = false;
       viewerMsg.hidden = true;
@@ -602,9 +610,11 @@
         return preload(res.url).then(function () { return res; });
       }).then(function (res) {
         if (my !== token) return;
+        currentUrl = res.url;
         viewerImg.src = res.url;
         viewerImg.classList.remove('loading');
         spinner.hidden = true;
+        saveBtn.disabled = false;
         if (res.link) {
           viewerSrc.href = res.link;
           viewerSrc.hidden = false;
@@ -617,6 +627,41 @@
       });
     }
 
+    function savePhoto() {
+      if (!currentUrl) return;
+      var url = currentUrl;
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'saving...';
+
+      fetch(url)
+        .then(function (r) {
+          if (!r.ok) throw new Error('bad response');
+          return r.blob();
+        })
+        .then(function (blob) {
+          var ext = (blob.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+          var href = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = href;
+          a.download = 'texmacros-' + currentKind + '-' + Date.now() + '.' + ext;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () { URL.revokeObjectURL(href); }, 2000);
+          saveBtn.textContent = 'saved';
+        })
+        .catch(function () {
+          window.open(url, '_blank');
+          saveBtn.textContent = 'save';
+        })
+        .then(function () {
+          setTimeout(function () {
+            saveBtn.textContent = 'save';
+            saveBtn.disabled = !currentUrl;
+          }, 1500);
+        });
+    }
+
     function openViewer(kind) {
       currentKind = kind;
       viewer.hidden = false;
@@ -625,6 +670,7 @@
 
     function closeViewer() {
       token++;
+      currentUrl = null;
       viewer.hidden = true;
       viewerImg.removeAttribute('src');
     }
@@ -633,6 +679,7 @@
       btn.addEventListener('click', function () { openViewer(btn.dataset.kind); });
     });
 
+    saveBtn.addEventListener('click', savePhoto);
     againBtn.addEventListener('click', loadPhoto);
     closeBtn.addEventListener('click', closeViewer);
     viewer.addEventListener('click', function (e) {
