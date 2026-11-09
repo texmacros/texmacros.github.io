@@ -399,7 +399,7 @@
   </main>
 
   <div class="actions">
-    <button class="chip" data-kind="kpop">random k-pop photo</button>
+    <button class="chip" data-kind="babymonster">random babymonster photo</button>
     <button class="chip" data-kind="cats">random cats photo</button>
   </div>
 
@@ -541,10 +541,15 @@
     var currentUrl = null;
     var token = 0;
 
-    function pickRandom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
+    function shuffle(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      }
+      return arr;
     }
 
+    /* cats */
     function getCat() {
       return fetch('https://api.thecatapi.com/v1/images/search')
         .then(function (r) { return r.json(); })
@@ -554,36 +559,55 @@
         });
     }
 
-    function getKpopOnce(offset) {
-      var queries = ['K-pop concert', 'K-pop idol', 'K-pop girl group', 'K-pop boy band'];
-      var q = pickRandom(queries) + ' filetype:bitmap';
+    /* babymonster: only files whose title or category mentions the group */
+    var bmPool = null;
+    var bmQueue = [];
+
+    function fetchBabymonster(query) {
       var url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*'
-        + '&generator=search&gsrnamespace=6&gsrlimit=30&gsroffset=' + offset
-        + '&gsrsearch=' + encodeURIComponent(q)
-        + '&prop=imageinfo&iiprop=url|mime&iiurlwidth=900';
+        + '&generator=search&gsrnamespace=6&gsrlimit=50'
+        + '&gsrsearch=' + encodeURIComponent(query + ' filetype:bitmap')
+        + '&prop=imageinfo|categories&iiprop=url|mime&iiurlwidth=900&cllimit=max';
       return fetch(url)
         .then(function (r) { return r.json(); })
         .then(function (j) {
           var pages = j.query ? Object.keys(j.query.pages).map(function (k) { return j.query.pages[k]; }) : [];
-          pages = pages.filter(function (p) {
+          return pages.filter(function (p) {
             var i = p.imageinfo && p.imageinfo[0];
-            return i && /^image\/(jpeg|png)$/.test(i.mime) && i.thumburl;
+            if (!i || !/^image\/(jpeg|png)$/.test(i.mime) || !i.thumburl) return false;
+            var cats = (p.categories || []).map(function (c) { return c.title; }).join(' ');
+            return /baby\s*monster/i.test(p.title + ' ' + cats) && !/logo/i.test(p.title);
+          }).map(function (p) {
+            var i = p.imageinfo[0];
+            return { url: i.thumburl, link: i.descriptionurl };
           });
-          if (!pages.length) return null;
-          var info = pickRandom(pages).imageinfo[0];
-          return { url: info.thumburl, link: info.descriptionurl };
         });
     }
 
-    function getKpop() {
-      var offsets = [Math.floor(Math.random() * 100), Math.floor(Math.random() * 30), 0];
-      var p = Promise.resolve(null);
-      offsets.forEach(function (off) {
-        p = p.then(function (res) { return res || getKpopOnce(off); });
+    function loadBmPool() {
+      if (bmPool) return Promise.resolve(bmPool);
+      return Promise.all([
+        fetchBabymonster('BabyMonster'),
+        fetchBabymonster('BABYMONSTER'),
+        fetchBabymonster('Babymonster performing')
+      ]).then(function (lists) {
+        var seen = {};
+        var merged = [];
+        lists.forEach(function (list) {
+          list.forEach(function (item) {
+            if (!seen[item.url]) { seen[item.url] = true; merged.push(item); }
+          });
+        });
+        if (merged.length) bmPool = merged;
+        return merged;
       });
-      return p.then(function (res) {
-        if (!res) throw new Error('empty');
-        return res;
+    }
+
+    function getBabymonster() {
+      return loadBmPool().then(function (pool) {
+        if (!pool.length) throw new Error('empty');
+        if (!bmQueue.length) bmQueue = shuffle(pool.slice());
+        return bmQueue.pop();
       });
     }
 
@@ -605,7 +629,7 @@
       viewerMsg.hidden = true;
       viewerSrc.hidden = true;
 
-      var source = currentKind === 'cats' ? getCat() : getKpop();
+      var source = currentKind === 'cats' ? getCat() : getBabymonster();
       source.then(function (res) {
         return preload(res.url).then(function () { return res; });
       }).then(function (res) {
