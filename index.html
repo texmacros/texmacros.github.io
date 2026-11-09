@@ -387,92 +387,132 @@
 
     /* ---------- work experience ---------- */
     .exp {
+      --gx: 50%;
+      --gy: 50%;
+      position: relative;
       margin-top: 28px;
+      height: 230px;
       border-radius: 28px;
       background: var(--tile);
-      text-align: left;
+      overflow: hidden;
+      cursor: pointer;
+      outline: none;
+      touch-action: pan-y;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
       transition: background .4s ease;
     }
 
-    .exp-head {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 18px 22px;
-      border: 0;
-      background: transparent;
-      color: var(--text);
-      font: inherit;
-      font-size: 17px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .exp-head svg { width: 22px; height: 22px; flex: none; }
-    .exp-head .ico { color: rgb(var(--accent-rgb)); }
-    .exp-arrow { margin-left: auto; transition: transform .35s ease; }
-
-    .exp-body {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows .45s ease;
-    }
-
-    .exp-inner { overflow: hidden; }
-
-    .logos {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px 10px;
-      padding: 2px 16px 20px;
-    }
-
-    .co {
-      text-align: center;
+    .exp::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(260px circle at var(--gx) var(--gy), rgba(var(--accent-rgb), .28), transparent 70%);
       opacity: 0;
-      transform: translateY(10px) scale(.85);
-      transition: opacity .3s ease, transform .3s ease;
-      transition-delay: calc(var(--i) * 60ms);
+      transition: opacity .35s ease;
     }
 
-    .logo {
-      aspect-ratio: 1;
-      border-radius: 22px;
+    .exp:focus-visible { box-shadow: 0 0 0 3px rgb(var(--accent-rgb)); }
+
+    .exp-idle,
+    .exp-show {
+      position: absolute;
+      inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      background: var(--brand);
-      color: var(--ink);
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -.01em;
+      transition: opacity .35s ease, transform .35s ease;
     }
 
-    .logo.has-img { background: #fff; padding: 12px; }
-    .logo img { width: 100%; height: 100%; object-fit: contain; }
+    .exp-idle svg {
+      width: 40px;
+      height: 40px;
+      color: rgb(var(--accent-rgb));
+    }
 
-    .co-name {
+    .exp-title {
+      margin-top: 12px;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .exp-hint {
       margin-top: 6px;
-      font-size: 13px;
-      color: var(--text2);
+      font-size: 14px;
+      opacity: .75;
     }
 
-    .exp.open .exp-body { grid-template-rows: 1fr; }
-    .exp.open .exp-arrow { transform: rotate(180deg); }
-    .exp.open .co { opacity: 1; transform: none; }
-
-    @media (hover: hover) {
-      .exp:hover .exp-body { grid-template-rows: 1fr; }
-      .exp:hover .exp-arrow { transform: rotate(180deg); }
-      .exp:hover .co { opacity: 1; transform: none; }
+    .exp-show {
+      opacity: 0;
+      transform: scale(.92);
+      pointer-events: none;
     }
+
+    .exp-logo {
+      --mx: 0px;
+      --my: 0px;
+      --rot: 0deg;
+      position: relative;
+      width: 112px;
+      height: 112px;
+      transform: translate(var(--mx), var(--my)) rotate(var(--rot));
+      transition: transform .18s ease-out;
+    }
+
+    .exp-logo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      opacity: 0;
+      transform: scale(.6) rotate(-8deg);
+      transition: opacity .25s ease, transform .3s cubic-bezier(.3, 1.5, .5, 1);
+    }
+
+    .exp-logo img.pad { padding: 10px; }
+    .exp-logo img.on { opacity: 1; transform: none; }
+
+    .exp-name {
+      margin-top: 16px;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .exp-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .exp-dots i {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(var(--accent-rgb), .35);
+      transition: width .25s ease, background .25s ease;
+    }
+
+    .exp-dots i.on {
+      width: 18px;
+      background: rgb(var(--accent-rgb));
+    }
+
+    .exp.active::before { opacity: 1; }
+    .exp.active .exp-idle { opacity: 0; transform: scale(.85); }
+    .exp.active .exp-show { opacity: 1; transform: none; }
 
     @media (prefers-reduced-motion: reduce) {
       .card, .panel, .lang-menu, .gridlayer, .blob { animation: none; }
       .bubble, .shape { display: none; }
-      .exp-body, .exp-arrow, .co { transition: none; }
+      .exp-idle, .exp-show, .exp-logo, .exp-logo img { transition: none; }
     }
   </style>
 </head>
@@ -508,16 +548,16 @@
       </a>
     </div>
 
-    <section class="exp" id="exp">
-      <button class="exp-head" id="expHead" type="button" aria-expanded="false" aria-controls="expBody">
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 16v-1H3.01L3 19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-4h-7v1h-4zm10-9h-4.01V5l-2-2h-4l-2 2v2H4c-1.1 0-2 .9-2 2v3c0 1.11.89 2 2 2h6v-2h4v2h6c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-6 0h-4V5h4v2z"/></svg>
-        <span data-i18n="exp">work experience</span>
-        <svg class="exp-arrow" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-      </button>
-      <div class="exp-body" id="expBody">
-        <div class="exp-inner">
-          <div class="logos" id="logos"></div>
-        </div>
+    <section class="exp" id="exp" tabindex="0" aria-roledescription="carousel">
+      <div class="exp-idle">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 16v-1H3.01L3 19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-4h-7v1h-4zm10-9h-4.01V5l-2-2h-4l-2 2v2H4c-1.1 0-2 .9-2 2v3c0 1.11.89 2 2 2h6v-2h4v2h6c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-6 0h-4V5h4v2z"/></svg>
+        <p class="exp-title" data-i18n="exp">work experience</p>
+        <p class="exp-hint" id="expHint" data-i18n="expHint">hover and move the cursor</p>
+      </div>
+      <div class="exp-show" aria-live="polite">
+        <div class="exp-logo" id="expLogo"></div>
+        <p class="exp-name" id="expName"></p>
+        <div class="exp-dots" id="expDots"></div>
       </div>
     </section>
   </main>
@@ -568,16 +608,16 @@
     var LANGS = ['en', 'ru', 'uz', 'tr', 'kk', 'ko', 'zh', 'es', 'de', 'fr'];
 
     var I18N = {
-      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   exp: 'work experience', modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
-      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    exp: 'опыт работы', modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
-      uz: { name: 'Oʻzbekcha', code: 'UZ', city: 'toshkent',  bg: 'fon',          color: 'rang',    exp: 'ish tajribasi', modes: ['pufakchalar', 'shakllar', 'shafaq', 'toʻr', 'fonsiz'] },
-      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    exp: 'iş deneyimi', modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
-      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     exp: 'жұмыс тәжірибесі', modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
-      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    exp: '경력', modes: ['거품', '도형', '오로라', '격자', '단색'] },
-      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    exp: '工作经历', modes: ['气泡', '图形', '极光', '网格', '纯色'] },
-      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   exp: 'experiencia laboral', modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
-      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   exp: 'berufserfahrung', modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
-      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', exp: 'expérience professionnelle', modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
+      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   exp: 'work experience', expHint: 'hover and move the cursor', expTap: 'tap or swipe', modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
+      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    exp: 'опыт работы', expHint: 'наведите и ведите курсор', expTap: 'нажмите или проведите', modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
+      uz: { name: 'Oʻzbekcha', code: 'UZ', city: 'toshkent',  bg: 'fon',          color: 'rang',    exp: 'ish tajribasi', expHint: 'kursorni olib keling va suring', expTap: 'bosing yoki suring', modes: ['pufakchalar', 'shakllar', 'shafaq', 'toʻr', 'fonsiz'] },
+      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    exp: 'iş deneyimi', expHint: 'imleci getirip gezdirin', expTap: 'dokunun veya kaydırın', modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
+      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     exp: 'жұмыс тәжірибесі', expHint: 'курсорды апарып, жылжытыңыз', expTap: 'басыңыз немесе сырғытыңыз', modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
+      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    exp: '경력', expHint: '마우스를 올리고 움직여 보세요', expTap: '탭하거나 밀어 보세요', modes: ['거품', '도형', '오로라', '격자', '단색'] },
+      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    exp: '工作经历', expHint: '将鼠标移入并左右移动', expTap: '点击或滑动', modes: ['气泡', '图形', '极光', '网格', '纯色'] },
+      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   exp: 'experiencia laboral', expHint: 'pasa y mueve el cursor', expTap: 'toca o desliza', modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
+      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   exp: 'berufserfahrung', expHint: 'mit der maus darüberfahren', expTap: 'tippen oder wischen', modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
+      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', exp: 'expérience professionnelle', expHint: 'survolez et déplacez le curseur', expTap: 'touchez ou glissez', modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
     };
 
     var lang = loadSetting('lang', LANGS, 'en');
@@ -741,7 +781,10 @@
       applyLang();
     });
 
-    document.addEventListener('click', closeMenus);
+    document.addEventListener('click', function () {
+      closeMenus();
+      if (!canHover) closeExp();
+    });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMenus();
     });
@@ -763,52 +806,103 @@
     }
 
     /* ---------- work experience ---------- */
-    // Put a real logo at logos/<id>.png and it replaces the colored tile automatically.
     var COMPANIES = [
-      { id: 'uzum-tezkor', name: 'Uzum Tezkor', mark: 'uzum', brand: '#7000FF', ink: '#FFFFFF' },
-      { id: 'kfc',         name: 'KFC',         mark: 'KFC',  brand: '#E4002B', ink: '#FFFFFF' },
-      { id: 'express24',   name: 'Express24',   mark: 'E24',  brand: '#FFCC00', ink: '#1A1A1A' },
-      { id: 'cold-stone',  name: 'Cold Stone',  mark: 'CS',   brand: '#A3162E', ink: '#FFFFFF' },
-      { id: 'dodo-pizza',  name: 'Dodo Pizza',  mark: 'dodo', brand: '#FF6900', ink: '#FFFFFF' },
-      { id: 'yandex-taxi', name: 'Yandex Taxi', mark: 'taxi', brand: '#FFD600', ink: '#1A1A1A' }
+      { name: 'Uzum Tezkor', logo: 'logos/uzum-tezkor.png' },
+      { name: 'KFC',         logo: 'logos/kfc.png' },
+      { name: 'Express24',   logo: 'logos/express24.png' },
+      { name: 'Cold Stone',  logo: 'logos/cold-stone.svg', pad: true },
+      { name: 'Dodo Pizza',  logo: 'logos/dodo-pizza.png' },
+      { name: 'Yandex Taxi', logo: 'logos/yandex-taxi.png' }
     ];
 
     var exp = document.getElementById('exp');
-    var expHead = document.getElementById('expHead');
-    var logos = document.getElementById('logos');
+    var expLogo = document.getElementById('expLogo');
+    var expName = document.getElementById('expName');
+    var expDots = document.getElementById('expDots');
+    var canHover = window.matchMedia('(hover: hover)').matches;
+    var current = -1;
 
-    COMPANIES.forEach(function (c, i) {
-      var co = document.createElement('div');
-      co.className = 'co';
-      co.style.setProperty('--i', i);
+    document.getElementById('expHint').setAttribute('data-i18n', canHover ? 'expHint' : 'expTap');
 
-      var tile = document.createElement('div');
-      tile.className = 'logo';
-      tile.style.setProperty('--brand', c.brand);
-      tile.style.setProperty('--ink', c.ink);
-      tile.textContent = c.mark;
-
-      var img = new Image();
+    COMPANIES.forEach(function (c) {
+      var img = document.createElement('img');
+      img.src = c.logo;
       img.alt = c.name;
-      img.onload = function () {
-        tile.textContent = '';
-        tile.classList.add('has-img');
-        tile.appendChild(img);
-      };
-      img.src = 'logos/' + c.id + '.png';
-
-      var name = document.createElement('p');
-      name.className = 'co-name';
-      name.textContent = c.name;
-
-      co.appendChild(tile);
-      co.appendChild(name);
-      logos.appendChild(co);
+      if (c.pad) img.className = 'pad';
+      expLogo.appendChild(img);
+      expDots.appendChild(document.createElement('i'));
     });
 
-    expHead.addEventListener('click', function () {
-      var open = exp.classList.toggle('open');
-      expHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    function showCompany(i) {
+      if (i === current) return;
+      current = i;
+      expLogo.querySelectorAll('img').forEach(function (img, k) { img.classList.toggle('on', k === i); });
+      expDots.querySelectorAll('i').forEach(function (d, k) { d.classList.toggle('on', k === i); });
+      expName.textContent = COMPANIES[i].name;
+    }
+
+    function openExp(i) {
+      exp.classList.add('active');
+      showCompany(i);
+    }
+
+    function closeExp() {
+      exp.classList.remove('active');
+      expLogo.style.setProperty('--mx', '0px');
+      expLogo.style.setProperty('--my', '0px');
+      expLogo.style.setProperty('--rot', '0deg');
+    }
+
+    // the logo is picked by where the cursor is across the card, and leans toward it
+    function follow(e) {
+      var r = exp.getBoundingClientRect();
+      var x = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 0.999);
+      var y = Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1);
+      openExp(Math.floor(x * COMPANIES.length));
+      exp.style.setProperty('--gx', x * 100 + '%');
+      exp.style.setProperty('--gy', y * 100 + '%');
+      expLogo.style.setProperty('--mx', (x - 0.5) * 60 + 'px');
+      expLogo.style.setProperty('--my', (y - 0.5) * 24 + 'px');
+      expLogo.style.setProperty('--rot', (x - 0.5) * 14 + 'deg');
+    }
+
+    // on touch screens a finger swipe scrubs through the logos, a plain tap goes to the next one
+    var touchX = null;
+    var swiped = false;
+
+    exp.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse') { touchX = e.clientX; swiped = false; }
+    });
+
+    exp.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'mouse') { follow(e); return; }
+      if (touchX !== null && Math.abs(e.clientX - touchX) > 8) swiped = true;
+      if (swiped) follow(e);
+    });
+
+    exp.addEventListener('pointerup', function () { touchX = null; });
+    exp.addEventListener('pointercancel', function () { touchX = null; });
+
+    exp.addEventListener('pointerleave', function (e) {
+      if (e.pointerType === 'mouse') closeExp();
+    });
+
+    exp.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (canHover) return;
+      if (swiped) { swiped = false; return; }
+      if (!exp.classList.contains('active')) openExp(0);
+      else showCompany((current + 1) % COMPANIES.length);
+    });
+
+    exp.addEventListener('focus', function () {
+      if (exp.matches(':focus-visible')) openExp(Math.max(current, 0));
+    });
+    exp.addEventListener('blur', closeExp);
+    exp.addEventListener('keydown', function (e) {
+      var n = COMPANIES.length;
+      if (e.key === 'ArrowRight') showCompany((current + 1) % n);
+      else if (e.key === 'ArrowLeft') showCompany((current - 1 + n) % n);
     });
 
     /* ---------- start ---------- */
