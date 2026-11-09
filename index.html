@@ -60,7 +60,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px 20px 88px;
+      padding: 76px 20px 88px;
       background: var(--bg);
       font-family: Roboto, Arial, sans-serif;
       color: var(--text2);
@@ -201,27 +201,32 @@
     h1 { font-size: 34px; color: var(--text); }
     .meta { margin-top: 8px; font-size: 18px; }
 
-    /* ---------- weather + rate tiles ---------- */
+    /* ---------- tiles ---------- */
     .info {
       margin-top: 28px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
     }
 
     .tile {
       display: block;
-      padding: 14px 8px;
+      width: 100%;
+      padding: 16px 18px;
       border-radius: 24px;
       background: var(--tile);
       color: var(--text);
-      text-decoration: none;
-      text-align: center;
-      transition: background .4s ease;
+      text-align: left;
+      transition: background .4s ease, transform .2s ease;
     }
 
-    a.tile { transition: transform .2s ease, background .4s ease; }
-    a.tile:active { transform: scale(.97); }
+    button.tile {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button.tile:active { transform: scale(.98); }
 
     .tile .label {
       font-size: 12px;
@@ -229,17 +234,116 @@
       color: var(--text2);
     }
 
-    .tile .value {
+    .clock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .c-left { min-width: 0; }
+
+    .time {
       margin-top: 6px;
-      font-size: clamp(18px, 5.2vw, 26px);
+      font-size: 36px;
       font-weight: 700;
-      line-height: 1.15;
-      white-space: nowrap;
+      line-height: 1;
       font-variant-numeric: tabular-nums;
     }
 
+    .date {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .date svg { width: 16px; height: 16px; flex: none; }
+
+    .c-right {
+      min-width: 0;
+      text-align: right;
+    }
+
+    .w-val {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .w-sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .conv .row {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .field {
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, .22);
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    .field:focus {
+      outline: 2px solid rgba(var(--accent-rgb), .7);
+      outline-offset: 0;
+    }
+
+    select.field {
+      flex: 1;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 34px;
+      text-overflow: ellipsis;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='%23CCC2DC' d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-color: rgba(0, 0, 0, .22);
+    }
+
+    select.field option {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    input.field {
+      width: 108px;
+      text-align: right;
+    }
+
+    .value {
+      margin-top: 12px;
+      font-size: clamp(20px, 6vw, 28px);
+      font-weight: 700;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .value .unit {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text2);
+    }
+
     .tile .sub {
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 12px;
       color: var(--text2);
     }
@@ -271,6 +375,209 @@
 
     .btn:active { transform: scale(.96); }
     .btn.primary { background: rgb(var(--accent-rgb)); color: var(--on-accent); }
+
+    .split {
+      display: inline-flex;
+      align-items: stretch;
+      max-width: 100%;
+      padding: 0;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .split:active { transform: none; }
+
+    .seg {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      color: inherit;
+      font: inherit;
+      font-size: 16px;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    .seg:active { background: rgba(255, 255, 255, .1); }
+
+    .seg.main {
+      min-width: 0;
+      padding-left: 24px;
+    }
+
+    .seg.save {
+      flex: none;
+      gap: 6px;
+      padding-right: 20px;
+      border-left: 1px solid rgba(255, 255, 255, .18);
+      font-size: 14px;
+    }
+
+    .seg svg { flex: none; }
+
+    @media (max-width: 380px) {
+      .seg.save .lbl { display: none; }
+      .seg.save { padding: 14px 16px; }
+    }
+
+    /* ---------- language button ---------- */
+    .lang {
+      position: fixed;
+      top: calc(14px + env(safe-area-inset-top, 0px));
+      right: 14px;
+      z-index: 7;
+    }
+
+    .lang-btn {
+      height: 44px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(var(--accent-rgb), .25);
+      border-radius: 999px;
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform .2s ease;
+    }
+
+    .lang-btn:active { transform: scale(.95); }
+    .lang-btn svg { width: 20px; height: 20px; }
+
+    .lang-menu {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      width: 210px;
+      max-height: min(70vh, 460px);
+      overflow-y: auto;
+      padding: 8px;
+      border-radius: 24px;
+      background: var(--bg);
+      border: 1px solid rgba(var(--accent-rgb), .25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .45);
+      animation: fadeUp .2s ease both;
+    }
+
+    .lang-menu[hidden] { display: none; }
+
+    .lang-opt {
+      display: block;
+      width: 100%;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .lang-opt.on {
+      background: rgb(var(--accent-rgb));
+      color: var(--on-accent);
+    }
+
+    /* ---------- calendar ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(18, 10, 28, .7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .overlay[hidden] { display: none; }
+
+    .cal {
+      width: 100%;
+      max-width: 340px;
+      padding: 16px;
+      border-radius: 28px;
+      background: var(--bg);
+      border: 1px solid rgba(var(--accent-rgb), .25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .45);
+      animation: fadeUp .25s ease both;
+    }
+
+    .cal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .cal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      text-transform: capitalize;
+    }
+
+    .cal-nav {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--tile);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .cal-nav:active { transform: scale(.92); }
+    .cal-nav svg { width: 20px; height: 20px; }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .dow {
+      padding-bottom: 4px;
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .d {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .d.today {
+      background: rgb(var(--accent-rgb));
+      color: var(--on-accent);
+      font-weight: 700;
+    }
 
     /* ---------- appearance panel ---------- */
     .fab {
@@ -368,7 +675,7 @@
     .sw[data-pick="blue"]   { background: #AEC6FF; }
 
     @media (prefers-reduced-motion: reduce) {
-      .card, .panel, .gridlayer, .blob { animation: none; }
+      .card, .panel, .cal, .lang-menu, .gridlayer, .blob { animation: none; }
       .bubble, .shape { display: none; }
     }
   </style>
@@ -376,24 +683,45 @@
 <body>
   <div class="bg" id="bg"></div>
 
+  <div class="lang">
+    <button class="lang-btn" id="langBtn" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 0 1 5.08 16zm2.95-8H5.08a7.987 7.987 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+      <span id="langCode">EN</span>
+    </button>
+    <div class="lang-menu" id="langMenu" hidden></div>
+  </div>
+
   <main class="card">
     <img class="avatar" src="avatar.jpg" alt="texmacros"
          onerror="this.onerror=null;this.src='https://github.com/texmacros.png'">
     <h1>texmacros</h1>
-    <p class="meta">13.10.2005 · tashkent</p>
+    <p class="meta">13.10.2005 · <span data-i18n="city">tashkent</span></p>
 
     <div class="info">
-      <div class="tile">
-        <div class="label">tashkent</div>
-        <div class="value" id="wValue">…</div>
-        <div class="sub" id="wSub">loading</div>
-      </div>
+      <button class="tile clock" id="clockTile" type="button" aria-label="Calendar">
+        <div class="c-left">
+          <div class="label" data-i18n="city">tashkent</div>
+          <div class="time" id="tTime">--:--</div>
+          <div class="date">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+            <span id="tDate"></span>
+          </div>
+        </div>
+        <div class="c-right">
+          <div class="w-val" id="wValue">…</div>
+          <div class="w-sub" id="wSub">loading</div>
+        </div>
+      </button>
 
-      <a class="tile" href="https://cbu.uz/en/arkhiv-kursov-valyut/" target="_blank" rel="noopener">
-        <div class="label">usd · cbu</div>
-        <div class="value" id="rValue">…</div>
+      <div class="tile conv">
+        <div class="label" data-i18n="conv">converter · cbu</div>
+        <div class="row">
+          <select class="field" id="curSel" aria-label="Currency"><option value="USD">USD</option></select>
+          <input class="field" id="amt" type="text" inputmode="decimal" maxlength="12" value="1" aria-label="Amount" autocomplete="off">
+        </div>
+        <div class="value"><span id="rNum">…</span><span class="unit" id="rUnit"></span></div>
         <div class="sub"><span id="rDiff"></span><span id="rDate">loading</span></div>
-      </a>
+      </div>
     </div>
 
     <div class="links">
@@ -405,52 +733,169 @@
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
         texmacros@gmail.com
       </a>
-      <a class="btn" href="tel:+998338696969">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        +998 33 869 69 69
-      </a>
+
+      <div class="btn split">
+        <a class="seg main" href="tel:+998338696969">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          +998 33 869 69 69
+        </a>
+        <button class="seg save" id="saveBtn" type="button" aria-label="Save contact">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm14-9h-4V3H9v8H5l7 7 7-7z"/></svg>
+          <span class="lbl" id="saveLbl">save</span>
+        </button>
+      </div>
     </div>
   </main>
 
-  <button class="fab" id="fab" aria-label="Appearance" aria-expanded="false">
+  <div class="overlay" id="calOverlay" hidden>
+    <div class="cal" id="cal">
+      <div class="cal-head">
+        <button class="cal-nav" id="calPrev" type="button" aria-label="Previous month">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="cal-title" id="calTitle"></div>
+        <button class="cal-nav" id="calNext" type="button" aria-label="Next month">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" type="button" aria-label="Appearance" aria-expanded="false">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
   </button>
 
   <div class="panel" id="panel" hidden>
-    <p class="p-title">background</p>
+    <p class="p-title" data-i18n="bg">background</p>
     <div class="opts" id="bgOpts">
-      <button class="opt" data-mode="bubbles">bubbles</button>
-      <button class="opt" data-mode="shapes">shapes</button>
-      <button class="opt" data-mode="aurora">aurora</button>
-      <button class="opt" data-mode="grid">grid</button>
-      <button class="opt" data-mode="plain">plain</button>
+      <button class="opt" type="button" data-mode="bubbles">bubbles</button>
+      <button class="opt" type="button" data-mode="shapes">shapes</button>
+      <button class="opt" type="button" data-mode="aurora">aurora</button>
+      <button class="opt" type="button" data-mode="grid">grid</button>
+      <button class="opt" type="button" data-mode="plain">plain</button>
     </div>
 
-    <p class="p-title">color</p>
+    <p class="p-title" data-i18n="color">color</p>
     <div class="swatches" id="themeOpts">
-      <button class="sw" data-pick="purple" aria-label="purple"></button>
-      <button class="sw" data-pick="brown" aria-label="brown"></button>
-      <button class="sw" data-pick="teal" aria-label="teal"></button>
-      <button class="sw" data-pick="blue" aria-label="blue"></button>
+      <button class="sw" type="button" data-pick="purple" aria-label="purple"></button>
+      <button class="sw" type="button" data-pick="brown" aria-label="brown"></button>
+      <button class="sw" type="button" data-pick="teal" aria-label="teal"></button>
+      <button class="sw" type="button" data-pick="blue" aria-label="blue"></button>
     </div>
   </div>
 
   <script>
+    /* ---------- small helpers ---------- */
     function pickRandom(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function loadSetting(key, allowed, fallback) {
-      try {
-        var v = localStorage.getItem(key);
-        if (v && allowed.indexOf(v) !== -1) return v;
-      } catch (e) {}
-      return fallback;
+    function getLS(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
     }
 
-    function saveSetting(key, value) {
+    function setLS(key, value) {
       try { localStorage.setItem(key, value); } catch (e) {}
     }
+
+    function loadSetting(key, allowed, fallback) {
+      var v = getLS(key);
+      return v && allowed.indexOf(v) !== -1 ? v : fallback;
+    }
+
+    function fetchJson(url, ms) {
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, ms);
+      return fetch(url, { signal: ctrl.signal }).then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('bad response');
+        return r.json();
+      }, function (e) {
+        clearTimeout(timer);
+        throw e;
+      });
+    }
+
+    /* ---------- languages ---------- */
+    var TZ = 'Asia/Tashkent';
+    var LANGS = ['en', 'ru', 'uz', 'tr', 'kk', 'ko', 'zh', 'es', 'de', 'fr'];
+
+    var I18N = {
+      en: {
+        name: 'English', code: 'EN', loc: 'en',
+        city: 'tashkent', feels: 'feels', loading: 'loading', na: 'unavailable', cached: 'cached',
+        save: 'save', saved: 'saved', conv: 'converter · cbu', bg: 'background', color: 'color',
+        modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'],
+        wx: ['clear', 'mostly clear', 'partly cloudy', 'overcast', 'fog', 'drizzle', 'rain', 'snow', 'showers', 'snow showers', 'thunderstorm', 'weather']
+      },
+      ru: {
+        name: 'Русский', code: 'RU', loc: 'ru',
+        city: 'ташкент', feels: 'ощущается', loading: 'загрузка', na: 'недоступно', cached: 'кэш',
+        save: 'сохранить', saved: 'сохранено', conv: 'конвертер · цб', bg: 'фон', color: 'цвет',
+        modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'],
+        wx: ['ясно', 'малооблачно', 'переменная облачность', 'пасмурно', 'туман', 'морось', 'дождь', 'снег', 'ливни', 'снегопад', 'гроза', 'погода']
+      },
+      uz: {
+        name: 'Oʻzbekcha', code: 'UZ', loc: 'uz',
+        city: 'toshkent', feels: 'his etiladi', loading: 'yuklanmoqda', na: 'mavjud emas', cached: 'keshdan',
+        save: 'saqlash', saved: 'saqlandi', conv: 'konverter · mb', bg: 'fon', color: 'rang',
+        modes: ['pufakchalar', 'shakllar', 'shafaq', 'toʻr', 'fonsiz'],
+        wx: ['ochiq', 'asosan ochiq', 'qisman bulutli', 'bulutli', 'tuman', 'mayda yomgʻir', 'yomgʻir', 'qor', 'jala', 'qor yogʻishi', 'momaqaldiroq', 'ob-havo']
+      },
+      tr: {
+        name: 'Türkçe', code: 'TR', loc: 'tr',
+        city: 'taşkent', feels: 'hissedilen', loading: 'yükleniyor', na: 'kullanılamıyor', cached: 'önbellek',
+        save: 'kaydet', saved: 'kaydedildi', conv: 'çevirici · mb', bg: 'arka plan', color: 'renk',
+        modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'],
+        wx: ['açık', 'çoğunlukla açık', 'parçalı bulutlu', 'kapalı', 'sis', 'çiseleme', 'yağmur', 'kar', 'sağanak', 'kar sağanağı', 'gök gürültülü fırtına', 'hava']
+      },
+      kk: {
+        name: 'Қазақша', code: 'KK', loc: 'kk',
+        city: 'ташкент', feels: 'сезіледі', loading: 'жүктелуде', na: 'қолжетімсіз', cached: 'кэш',
+        save: 'сақтау', saved: 'сақталды', conv: 'конвертер · cbu', bg: 'фон', color: 'түс',
+        modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'],
+        wx: ['ашық', 'көбіне ашық', 'ауыспалы бұлтты', 'бұлтты', 'тұман', 'сіркіреген жаңбыр', 'жаңбыр', 'қар', 'нөсер', 'қарлы нөсер', 'найзағай', 'ауа райы']
+      },
+      ko: {
+        name: '한국어', code: 'KO', loc: 'ko',
+        city: '타슈켄트', feels: '체감', loading: '로딩 중', na: '사용 불가', cached: '캐시',
+        save: '저장', saved: '저장됨', conv: '환율 계산 · cbu', bg: '배경', color: '색상',
+        modes: ['거품', '도형', '오로라', '격자', '단색'],
+        wx: ['맑음', '대체로 맑음', '구름 조금', '흐림', '안개', '이슬비', '비', '눈', '소나기', '눈보라', '뇌우', '날씨']
+      },
+      zh: {
+        name: '中文', code: 'ZH', loc: 'zh-CN',
+        city: '塔什干', feels: '体感', loading: '加载中', na: '不可用', cached: '缓存',
+        save: '保存', saved: '已保存', conv: '汇率换算 · cbu', bg: '背景', color: '颜色',
+        modes: ['气泡', '图形', '极光', '网格', '纯色'],
+        wx: ['晴', '大部晴朗', '多云', '阴', '雾', '毛毛雨', '雨', '雪', '阵雨', '阵雪', '雷暴', '天气']
+      },
+      es: {
+        name: 'Español', code: 'ES', loc: 'es',
+        city: 'taskent', feels: 'sensación', loading: 'cargando', na: 'no disponible', cached: 'caché',
+        save: 'guardar', saved: 'guardado', conv: 'conversor · cbu', bg: 'fondo', color: 'color',
+        modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'],
+        wx: ['despejado', 'mayormente despejado', 'parcialmente nublado', 'nublado', 'niebla', 'llovizna', 'lluvia', 'nieve', 'chubascos', 'chubascos de nieve', 'tormenta', 'clima']
+      },
+      de: {
+        name: 'Deutsch', code: 'DE', loc: 'de',
+        city: 'taschkent', feels: 'gefühlt', loading: 'lädt', na: 'nicht verfügbar', cached: 'Cache',
+        save: 'speichern', saved: 'gespeichert', conv: 'umrechner · cbu', bg: 'hintergrund', color: 'farbe',
+        modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'],
+        wx: ['klar', 'überwiegend klar', 'teils bewölkt', 'bedeckt', 'nebel', 'nieselregen', 'regen', 'schnee', 'schauer', 'schneeschauer', 'gewitter', 'wetter']
+      },
+      fr: {
+        name: 'Français', code: 'FR', loc: 'fr',
+        city: 'tachkent', feels: 'ressenti', loading: 'chargement', na: 'indisponible', cached: 'cache',
+        save: 'enregistrer', saved: 'enregistré', conv: 'convertisseur · cbu', bg: 'arrière-plan', color: 'couleur',
+        modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'],
+        wx: ['dégagé', 'plutôt dégagé', 'partiellement nuageux', 'couvert', 'brouillard', 'bruine', 'pluie', 'neige', 'averses', 'averses de neige', 'orage', 'météo']
+      }
+    };
+
+    var lang = loadSetting('lang', LANGS, 'en');
+    function T() { return I18N[lang]; }
 
     /* ---------- background modes ---------- */
     var MODES = ['bubbles', 'shapes', 'aurora', 'grid', 'plain'];
@@ -520,13 +965,37 @@
       }
     }
 
-    /* ---------- appearance panel ---------- */
+    /* ---------- elements ---------- */
     var fab = document.getElementById('fab');
     var panel = document.getElementById('panel');
     var bgOpts = document.getElementById('bgOpts');
     var themeOpts = document.getElementById('themeOpts');
     var themeColor = document.getElementById('themeColor');
+    var langBtn = document.getElementById('langBtn');
+    var langMenu = document.getElementById('langMenu');
+    var langCode = document.getElementById('langCode');
 
+    var tTime = document.getElementById('tTime');
+    var tDate = document.getElementById('tDate');
+    var wValue = document.getElementById('wValue');
+    var wSub = document.getElementById('wSub');
+    var clockTile = document.getElementById('clockTile');
+
+    var curSel = document.getElementById('curSel');
+    var amt = document.getElementById('amt');
+    var rNum = document.getElementById('rNum');
+    var rUnit = document.getElementById('rUnit');
+    var rDiff = document.getElementById('rDiff');
+    var rDate = document.getElementById('rDate');
+
+    var saveBtn = document.getElementById('saveBtn');
+    var saveLbl = document.getElementById('saveLbl');
+
+    var calOverlay = document.getElementById('calOverlay');
+    var calTitle = document.getElementById('calTitle');
+    var calGrid = document.getElementById('calGrid');
+
+    /* ---------- appearance panel ---------- */
     function markActive(container, attr, value) {
       container.querySelectorAll('[' + attr + ']').forEach(function (b) {
         b.classList.toggle('on', b.getAttribute(attr) === value);
@@ -536,26 +1005,30 @@
     function setMode(mode) {
       renderBg(mode);
       markActive(bgOpts, 'data-mode', mode);
-      saveSetting('bgmode', mode);
+      setLS('bgmode', mode);
     }
 
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       markActive(themeOpts, 'data-pick', theme);
-      saveSetting('theme', theme);
+      setLS('theme', theme);
       var c = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
       if (c) themeColor.setAttribute('content', c);
     }
 
-    function togglePanel(open) {
-      var show = typeof open === 'boolean' ? open : panel.hidden;
-      panel.hidden = !show;
-      fab.setAttribute('aria-expanded', show ? 'true' : 'false');
+    function closeMenus() {
+      panel.hidden = true;
+      fab.setAttribute('aria-expanded', 'false');
+      langMenu.hidden = true;
+      langBtn.setAttribute('aria-expanded', 'false');
     }
 
     fab.addEventListener('click', function (e) {
       e.stopPropagation();
-      togglePanel();
+      var willOpen = panel.hidden;
+      closeMenus();
+      panel.hidden = !willOpen;
+      fab.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     });
 
     panel.addEventListener('click', function (e) { e.stopPropagation(); });
@@ -570,45 +1043,158 @@
       if (btn) setTheme(btn.getAttribute('data-pick'));
     });
 
-    document.addEventListener('click', function () { togglePanel(false); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') togglePanel(false);
-    });
-
-    setTheme(loadSetting('theme', THEMES, 'purple'));
-    setMode(loadSetting('bgmode', MODES, 'bubbles'));
-
-    /* ---------- helper: fetch JSON with a timeout ---------- */
-    function fetchJson(url, ms) {
-      var ctrl = new AbortController();
-      var timer = setTimeout(function () { ctrl.abort(); }, ms);
-      return fetch(url, { signal: ctrl.signal }).then(function (r) {
-        clearTimeout(timer);
-        if (!r.ok) throw new Error('bad response');
-        return r.json();
-      }, function (e) {
-        clearTimeout(timer);
-        throw e;
+    /* ---------- language menu ---------- */
+    function buildLangMenu() {
+      langMenu.innerHTML = '';
+      LANGS.forEach(function (code) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'lang-opt' + (code === lang ? ' on' : '');
+        b.setAttribute('data-lang', code);
+        b.textContent = I18N[code].name;
+        langMenu.appendChild(b);
       });
     }
 
+    langBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var willOpen = langMenu.hidden;
+      closeMenus();
+      langMenu.hidden = !willOpen;
+      langBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    });
+
+    langMenu.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var btn = e.target.closest('[data-lang]');
+      if (!btn) return;
+      lang = btn.getAttribute('data-lang');
+      setLS('lang', lang);
+      closeMenus();
+      buildLangMenu();
+      applyLang();
+    });
+
+    document.addEventListener('click', closeMenus);
+
+    /* ---------- clock + calendar ---------- */
+    var timeFmt, dateFmt;
+
+    function buildFormatters() {
+      var loc = T().loc;
+      timeFmt = new Intl.DateTimeFormat(loc, { timeZone: TZ, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      dateFmt = new Intl.DateTimeFormat(loc, { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' });
+    }
+
+    function renderClock() {
+      var now = new Date();
+      tTime.textContent = timeFmt.format(now);
+      tDate.textContent = dateFmt.format(now);
+    }
+
+    function tzToday() {
+      var parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(new Date());
+      var o = {};
+      parts.forEach(function (p) { o[p.type] = p.value; });
+      return { y: +o.year, m: +o.month - 1, d: +o.day };
+    }
+
+    var calY = 0, calM = 0;
+
+    function renderCal() {
+      var loc = T().loc;
+      var today = tzToday();
+
+      calTitle.textContent = new Intl.DateTimeFormat(loc, {
+        month: 'long', year: 'numeric', timeZone: 'UTC'
+      }).format(new Date(Date.UTC(calY, calM, 1)));
+
+      var dowFmt = new Intl.DateTimeFormat(loc, { weekday: 'short', timeZone: 'UTC' });
+      var html = '';
+      var i;
+      for (i = 0; i < 7; i++) {
+        html += '<div class="dow">' + dowFmt.format(new Date(Date.UTC(2024, 0, 1 + i))) + '</div>';
+      }
+
+      var first = (new Date(Date.UTC(calY, calM, 1)).getUTCDay() + 6) % 7;
+      var days = new Date(Date.UTC(calY, calM + 1, 0)).getUTCDate();
+      for (i = 0; i < first; i++) html += '<div></div>';
+      for (i = 1; i <= days; i++) {
+        var isToday = calY === today.y && calM === today.m && i === today.d;
+        html += '<div class="d' + (isToday ? ' today' : '') + '">' + i + '</div>';
+      }
+      calGrid.innerHTML = html;
+    }
+
+    function openCal() {
+      var today = tzToday();
+      calY = today.y;
+      calM = today.m;
+      closeMenus();
+      renderCal();
+      calOverlay.hidden = false;
+    }
+
+    function closeCal() { calOverlay.hidden = true; }
+
+    function shiftMonth(delta) {
+      calM += delta;
+      if (calM < 0) { calM = 11; calY--; }
+      if (calM > 11) { calM = 0; calY++; }
+      renderCal();
+    }
+
+    clockTile.addEventListener('click', function (e) {
+      e.stopPropagation();
+      openCal();
+    });
+
+    document.getElementById('calPrev').addEventListener('click', function () { shiftMonth(-1); });
+    document.getElementById('calNext').addEventListener('click', function () { shiftMonth(1); });
+    calOverlay.addEventListener('click', function (e) {
+      if (e.target === calOverlay) closeCal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeMenus(); closeCal(); }
+    });
+
+    setInterval(renderClock, 1000);
+
     /* ---------- weather: Open-Meteo ---------- */
-    var wValue = document.getElementById('wValue');
-    var wSub = document.getElementById('wSub');
+    var wState = 'loading';
+    var wData = null;
 
     function describe(code, isDay) {
-      if (code === 0) return ['clear', isDay ? '\u2600\uFE0F' : '\uD83C\uDF19'];
-      if (code === 1) return ['mostly clear', isDay ? '\uD83C\uDF24\uFE0F' : '\uD83C\uDF19'];
-      if (code === 2) return ['partly cloudy', '\u26C5'];
-      if (code === 3) return ['overcast', '\u2601\uFE0F'];
-      if (code === 45 || code === 48) return ['fog', '\uD83C\uDF2B\uFE0F'];
-      if (code >= 51 && code <= 57) return ['drizzle', '\uD83C\uDF26\uFE0F'];
-      if (code >= 61 && code <= 67) return ['rain', '\uD83C\uDF27\uFE0F'];
-      if (code >= 71 && code <= 77) return ['snow', '\u2744\uFE0F'];
-      if (code >= 80 && code <= 82) return ['showers', '\uD83C\uDF26\uFE0F'];
-      if (code === 85 || code === 86) return ['snow showers', '\uD83C\uDF28\uFE0F'];
-      if (code >= 95) return ['thunderstorm', '\u26C8\uFE0F'];
-      return ['weather', '\uD83C\uDF21\uFE0F'];
+      if (code === 0) return [0, isDay ? '\u2600\uFE0F' : '\uD83C\uDF19'];
+      if (code === 1) return [1, isDay ? '\uD83C\uDF24\uFE0F' : '\uD83C\uDF19'];
+      if (code === 2) return [2, '\u26C5'];
+      if (code === 3) return [3, '\u2601\uFE0F'];
+      if (code === 45 || code === 48) return [4, '\uD83C\uDF2B\uFE0F'];
+      if (code >= 51 && code <= 57) return [5, '\uD83C\uDF26\uFE0F'];
+      if (code >= 61 && code <= 67) return [6, '\uD83C\uDF27\uFE0F'];
+      if (code >= 71 && code <= 77) return [7, '\u2744\uFE0F'];
+      if (code >= 80 && code <= 82) return [8, '\uD83C\uDF26\uFE0F'];
+      if (code === 85 || code === 86) return [9, '\uD83C\uDF28\uFE0F'];
+      if (code >= 95) return [10, '\u26C8\uFE0F'];
+      return [11, '\uD83C\uDF21\uFE0F'];
+    }
+
+    function renderWeather() {
+      var d = T();
+      if (wState === 'ok' && wData) {
+        var x = describe(wData.code, wData.isDay);
+        wValue.textContent = x[1] + ' ' + Math.round(wData.temp) + '\u00B0';
+        wSub.textContent = d.wx[x[0]] + ' \u00B7 ' + d.feels + ' ' + Math.round(wData.feels) + '\u00B0';
+      } else if (wState === 'na') {
+        wValue.textContent = '\u2014';
+        wSub.textContent = d.na;
+      } else {
+        wValue.textContent = '\u2026';
+        wSub.textContent = d.loading;
+      }
     }
 
     function loadWeather() {
@@ -618,40 +1204,116 @@
         + '&timezone=Asia%2FTashkent';
       fetchJson(url, 8000).then(function (j) {
         var c = j.current;
-        var d = describe(c.weather_code, c.is_day);
-        wValue.textContent = d[1] + ' ' + Math.round(c.temperature_2m) + '\u00B0';
-        wSub.textContent = d[0] + ' \u00B7 feels ' + Math.round(c.apparent_temperature) + '\u00B0';
+        wData = {
+          code: c.weather_code,
+          isDay: c.is_day,
+          temp: c.temperature_2m,
+          feels: c.apparent_temperature
+        };
+        wState = 'ok';
+        renderWeather();
       }).catch(function () {
-        wValue.textContent = '\u2014';
-        wSub.textContent = 'unavailable';
+        if (wState !== 'ok') {
+          wState = 'na';
+          renderWeather();
+        }
       });
     }
 
-    loadWeather();
-    setInterval(loadWeather, 15 * 60 * 1000);
-
-    /* ---------- USD rate: Central Bank of Uzbekistan ---------- */
-    var rValue = document.getElementById('rValue');
-    var rDiff = document.getElementById('rDiff');
-    var rDate = document.getElementById('rDate');
-    var RATE_URL = 'https://cbu.uz/ru/arkhiv-kursov-valyut/json/USD/';
-    var CACHE_KEY = 'usd_cbu';
+    /* ---------- converter: Central Bank of Uzbekistan ---------- */
+    var CBU_ALL = 'https://cbu.uz/ru/arkhiv-kursov-valyut/json/';
+    var PINNED = ['USD', 'EUR', 'RUB', 'KZT', 'CNY', 'TRY', 'GBP', 'KRW', 'JPY', 'AED'];
+    var rates = null;
+    var rState = 'loading';
 
     function dateValue(s) {
       var p = String(s).split('.');
       return new Date(+p[2], +p[1] - 1, +p[0]).getTime() || 0;
     }
 
-    function showRate(item, saved) {
-      var rate = parseFloat(item.Rate);
-      var diff = parseFloat(item.Diff);
-      if (!rate) throw new Error('bad rate');
-
-      rValue.textContent = rate.toLocaleString('ru-RU', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+    function reduceRates(data) {
+      var best = {};
+      data.forEach(function (x) {
+        if (!x || !x.Ccy || !parseFloat(x.Rate)) return;
+        var prev = best[x.Ccy];
+        if (!prev || dateValue(x.Date) > dateValue(prev.Date)) {
+          best[x.Ccy] = { Ccy: x.Ccy, Rate: x.Rate, Diff: x.Diff, Date: x.Date, Nominal: x.Nominal };
+        }
       });
+      return Object.keys(best).map(function (k) { return best[k]; });
+    }
 
+    function currencyName(code) {
+      try {
+        var n = new Intl.DisplayNames([T().loc], { type: 'currency' }).of(code);
+        return n && n !== code ? n : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function buildSelect() {
+      if (!rates) return;
+      var current = curSel.value || getLS('cur') || 'USD';
+      var codes = rates.list.map(function (x) { return x.Ccy; });
+      var pinned = PINNED.filter(function (c) { return codes.indexOf(c) !== -1; });
+      var rest = codes.filter(function (c) { return pinned.indexOf(c) === -1; }).sort();
+
+      curSel.innerHTML = '';
+
+      function add(code) {
+        var o = document.createElement('option');
+        var n = currencyName(code);
+        o.value = code;
+        o.textContent = n ? code + ' \u2014 ' + n : code;
+        curSel.appendChild(o);
+      }
+
+      pinned.forEach(add);
+      if (pinned.length && rest.length) {
+        var sep = document.createElement('option');
+        sep.disabled = true;
+        sep.textContent = '\u2500\u2500\u2500\u2500\u2500\u2500';
+        curSel.appendChild(sep);
+      }
+      rest.forEach(add);
+
+      if (codes.indexOf(current) !== -1) curSel.value = current;
+      else curSel.value = codes.indexOf('USD') !== -1 ? 'USD' : codes[0];
+    }
+
+    function parseAmount(s) {
+      var n = parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
+      return isFinite(n) && n >= 0 ? n : 0;
+    }
+
+    function formatResult(n) {
+      var digits = n >= 1e6 ? 0 : 2;
+      return new Intl.NumberFormat(T().loc, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(n);
+    }
+
+    function renderConv() {
+      var d = T();
+      if (!rates) {
+        rNum.textContent = rState === 'na' ? '\u2014' : '\u2026';
+        rUnit.textContent = '';
+        rDiff.textContent = '';
+        rDate.textContent = rState === 'na' ? d.na : d.loading;
+        return;
+      }
+
+      var item = null;
+      rates.list.forEach(function (x) { if (x.Ccy === curSel.value) item = x; });
+      if (!item) return;
+
+      var perUnit = parseFloat(item.Rate) / (parseFloat(item.Nominal) || 1);
+      rNum.textContent = formatResult(parseAmount(amt.value) * perUnit);
+      rUnit.textContent = ' UZS';
+
+      var diff = parseFloat(item.Diff);
       rDiff.className = '';
       rDiff.textContent = '';
       if (diff > 0) {
@@ -661,39 +1323,115 @@
         rDiff.className = 'down';
         rDiff.textContent = '\u25BC ' + Math.abs(diff).toFixed(2) + ' \u00B7 ';
       }
-      rDate.textContent = item.Date + (saved ? ' (saved)' : '');
+      rDate.textContent = item.Date + (rates.saved ? ' \u00B7 ' + d.cached : '');
     }
 
-    function loadRate() {
+    curSel.addEventListener('change', function () {
+      setLS('cur', curSel.value);
+      renderConv();
+    });
+
+    amt.addEventListener('input', function () {
+      setLS('amt', amt.value);
+      renderConv();
+    });
+
+    function loadRates() {
       var cached = null;
-      try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) {}
-      if (cached) {
-        try { showRate(cached, true); } catch (e) {}
+      try { cached = JSON.parse(getLS('cbu_all')); } catch (e) {}
+      if (cached && cached.length) {
+        rates = { list: cached, saved: true };
+        rState = 'ok';
+        buildSelect();
+        renderConv();
       }
 
-      fetchJson(RATE_URL, 8000).then(function (data) {
-        var list = (Array.isArray(data) ? data : []).filter(function (x) {
-          return x && x.Ccy === 'USD';
-        });
+      fetchJson(CBU_ALL, 8000).then(function (data) {
+        var list = reduceRates(Array.isArray(data) ? data : []);
         if (!list.length) throw new Error('empty');
-        list.sort(function (a, b) { return dateValue(b.Date) - dateValue(a.Date); });
-        var item = list[0];
-        showRate(item, false);
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify({
-            Rate: item.Rate, Diff: item.Diff, Date: item.Date
-          }));
-        } catch (e) {}
+        rates = { list: list, saved: false };
+        rState = 'ok';
+        setLS('cbu_all', JSON.stringify(list));
+        buildSelect();
+        renderConv();
       }).catch(function () {
-        if (!cached) {
-          rValue.textContent = '\u2014';
-          rDiff.textContent = '';
-          rDate.textContent = 'unavailable';
+        if (!rates) {
+          rState = 'na';
+          renderConv();
         }
       });
     }
 
-    loadRate();
+    /* ---------- save contact (.vcf) ---------- */
+    function saveContact() {
+      var vcf = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'N:texmacros;;;;',
+        'FN:texmacros',
+        'TEL;TYPE=CELL:+998338696969',
+        'EMAIL;TYPE=INTERNET:texmacros@gmail.com',
+        'URL:https://texmacros.github.io',
+        'URL:https://t.me/texmac',
+        'END:VCARD'
+      ].join('\r\n');
+
+      try {
+        var blob = new Blob([vcf], { type: 'text/vcard;charset=utf-8' });
+        var href = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = href;
+        a.download = 'texmacros.vcf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(href); }, 3000);
+      } catch (e) {
+        window.location.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcf);
+      }
+
+      saveLbl.textContent = '\u2713 ' + T().saved;
+      setTimeout(function () { saveLbl.textContent = T().save; }, 2000);
+    }
+
+    saveBtn.addEventListener('click', saveContact);
+
+    /* ---------- apply language to the whole page ---------- */
+    function applyLang() {
+      var d = T();
+      document.documentElement.lang = lang;
+      langCode.textContent = d.code;
+
+      document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        var v = d[el.getAttribute('data-i18n')];
+        if (typeof v === 'string') el.textContent = v;
+      });
+
+      bgOpts.querySelectorAll('[data-mode]').forEach(function (b) {
+        b.textContent = d.modes[MODES.indexOf(b.getAttribute('data-mode'))];
+      });
+
+      saveLbl.textContent = d.save;
+
+      buildFormatters();
+      renderClock();
+      renderWeather();
+      buildSelect();
+      renderConv();
+      if (!calOverlay.hidden) renderCal();
+    }
+
+    /* ---------- start ---------- */
+    var savedAmt = getLS('amt');
+    if (savedAmt !== null) amt.value = savedAmt;
+
+    setTheme(loadSetting('theme', THEMES, 'purple'));
+    setMode(loadSetting('bgmode', MODES, 'bubbles'));
+    buildLangMenu();
+    applyLang();
+    loadWeather();
+    setInterval(loadWeather, 15 * 60 * 1000);
+    loadRates();
   </script>
 </body>
 </html>
