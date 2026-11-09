@@ -385,9 +385,94 @@
     .sw[data-pick="teal"]   { background: #9FD6CE; }
     .sw[data-pick="blue"]   { background: #AEC6FF; }
 
+    /* ---------- work experience ---------- */
+    .exp {
+      margin-top: 28px;
+      border-radius: 28px;
+      background: var(--tile);
+      text-align: left;
+      transition: background .4s ease;
+    }
+
+    .exp-head {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .exp-head svg { width: 22px; height: 22px; flex: none; }
+    .exp-head .ico { color: rgb(var(--accent-rgb)); }
+    .exp-arrow { margin-left: auto; transition: transform .35s ease; }
+
+    .exp-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .45s ease;
+    }
+
+    .exp-inner { overflow: hidden; }
+
+    .logos {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px 10px;
+      padding: 2px 16px 20px;
+    }
+
+    .co {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px) scale(.85);
+      transition: opacity .3s ease, transform .3s ease;
+      transition-delay: calc(var(--i) * 60ms);
+    }
+
+    .logo {
+      aspect-ratio: 1;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--brand);
+      color: var(--ink);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .logo.has-img { background: #fff; padding: 12px; }
+    .logo img { width: 100%; height: 100%; object-fit: contain; }
+
+    .co-name {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .exp.open .exp-body { grid-template-rows: 1fr; }
+    .exp.open .exp-arrow { transform: rotate(180deg); }
+    .exp.open .co { opacity: 1; transform: none; }
+
+    @media (hover: hover) {
+      .exp:hover .exp-body { grid-template-rows: 1fr; }
+      .exp:hover .exp-arrow { transform: rotate(180deg); }
+      .exp:hover .co { opacity: 1; transform: none; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .card, .panel, .lang-menu, .gridlayer, .blob { animation: none; }
       .bubble, .shape { display: none; }
+      .exp-body, .exp-arrow, .co { transition: none; }
     }
   </style>
 </head>
@@ -422,6 +507,19 @@
         +998 33 869 69 69
       </a>
     </div>
+
+    <section class="exp" id="exp">
+      <button class="exp-head" id="expHead" type="button" aria-expanded="false" aria-controls="expBody">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10 16v-1H3.01L3 19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-4h-7v1h-4zm10-9h-4.01V5l-2-2h-4l-2 2v2H4c-1.1 0-2 .9-2 2v3c0 1.11.89 2 2 2h6v-2h4v2h6c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-6 0h-4V5h4v2z"/></svg>
+        <span data-i18n="exp">work experience</span>
+        <svg class="exp-arrow" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+      </button>
+      <div class="exp-body" id="expBody">
+        <div class="exp-inner">
+          <div class="logos" id="logos"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <button class="fab" id="fab" type="button" aria-label="Appearance" aria-expanded="false">
@@ -470,16 +568,16 @@
     var LANGS = ['en', 'ru', 'uz', 'tr', 'kk', 'ko', 'zh', 'es', 'de', 'fr'];
 
     var I18N = {
-      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
-      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
-      uz: { name: 'Oʻzbekcha', code: 'UZ', city: 'toshkent',  bg: 'fon',          color: 'rang',    modes: ['pufakchalar', 'shakllar', 'shafaq', 'toʻr', 'fonsiz'] },
-      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
-      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
-      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    modes: ['거품', '도형', '오로라', '격자', '단색'] },
-      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    modes: ['气泡', '图形', '极光', '网格', '纯色'] },
-      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
-      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
-      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
+      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   exp: 'work experience', modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
+      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    exp: 'опыт работы', modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
+      uz: { name: 'Oʻzbekcha', code: 'UZ', city: 'toshkent',  bg: 'fon',          color: 'rang',    exp: 'ish tajribasi', modes: ['pufakchalar', 'shakllar', 'shafaq', 'toʻr', 'fonsiz'] },
+      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    exp: 'iş deneyimi', modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
+      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     exp: 'жұмыс тәжірибесі', modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
+      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    exp: '경력', modes: ['거품', '도형', '오로라', '격자', '단색'] },
+      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    exp: '工作经历', modes: ['气泡', '图形', '极光', '网格', '纯色'] },
+      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   exp: 'experiencia laboral', modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
+      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   exp: 'berufserfahrung', modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
+      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', exp: 'expérience professionnelle', modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
     };
 
     var lang = loadSetting('lang', LANGS, 'en');
@@ -663,6 +761,55 @@
         b.textContent = d.modes[MODES.indexOf(b.getAttribute('data-mode'))];
       });
     }
+
+    /* ---------- work experience ---------- */
+    // Put a real logo at logos/<id>.png and it replaces the colored tile automatically.
+    var COMPANIES = [
+      { id: 'uzum-tezkor', name: 'Uzum Tezkor', mark: 'uzum', brand: '#7000FF', ink: '#FFFFFF' },
+      { id: 'kfc',         name: 'KFC',         mark: 'KFC',  brand: '#E4002B', ink: '#FFFFFF' },
+      { id: 'express24',   name: 'Express24',   mark: 'E24',  brand: '#FFCC00', ink: '#1A1A1A' },
+      { id: 'cold-stone',  name: 'Cold Stone',  mark: 'CS',   brand: '#A3162E', ink: '#FFFFFF' },
+      { id: 'dodo-pizza',  name: 'Dodo Pizza',  mark: 'dodo', brand: '#FF6900', ink: '#FFFFFF' },
+      { id: 'yandex-taxi', name: 'Yandex Taxi', mark: 'taxi', brand: '#FFD600', ink: '#1A1A1A' }
+    ];
+
+    var exp = document.getElementById('exp');
+    var expHead = document.getElementById('expHead');
+    var logos = document.getElementById('logos');
+
+    COMPANIES.forEach(function (c, i) {
+      var co = document.createElement('div');
+      co.className = 'co';
+      co.style.setProperty('--i', i);
+
+      var tile = document.createElement('div');
+      tile.className = 'logo';
+      tile.style.setProperty('--brand', c.brand);
+      tile.style.setProperty('--ink', c.ink);
+      tile.textContent = c.mark;
+
+      var img = new Image();
+      img.alt = c.name;
+      img.onload = function () {
+        tile.textContent = '';
+        tile.classList.add('has-img');
+        tile.appendChild(img);
+      };
+      img.src = 'logos/' + c.id + '.png';
+
+      var name = document.createElement('p');
+      name.className = 'co-name';
+      name.textContent = c.name;
+
+      co.appendChild(tile);
+      co.appendChild(name);
+      logos.appendChild(co);
+    });
+
+    expHead.addEventListener('click', function () {
+      var open = exp.classList.toggle('open');
+      expHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
 
     /* ---------- start ---------- */
     setTheme(loadSetting('theme', THEMES, 'purple'));
