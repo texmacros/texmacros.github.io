@@ -48,7 +48,7 @@
       z-index: 1;
       width: 100%;
       max-width: 520px;
-      padding: 48px 24px;
+      padding: 40px 24px 48px;
       text-align: center;
       background: rgba(43, 27, 61, .85);
       backdrop-filter: blur(6px);
@@ -61,11 +61,22 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    h1 { font-size: 44px; color: #EADDFF; }
+    .avatar {
+      display: block;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 20px;
+      object-fit: cover;
+      border-radius: 36%;
+      border: 3px solid #4A3A63;
+      background: #4A3A63;
+    }
+
+    h1 { font-size: 34px; color: #EADDFF; }
     .meta { margin-top: 8px; font-size: 18px; }
 
     .links {
-      margin-top: 36px;
+      margin-top: 32px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -88,8 +99,39 @@
     .btn:active { transform: scale(.96); }
     .btn.primary { background: #D0BCFF; color: #381E72; }
 
+    .music {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 2;
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 50%;
+      background: #D0BCFF;
+      color: #381E72;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,.35);
+      transition: transform .2s ease;
+    }
+
+    .music:active { transform: scale(.92); }
+    .music svg { width: 26px; height: 26px; }
+    .music .pause { display: none; }
+    .music.playing .play { display: none; }
+    .music.playing .pause { display: block; }
+    .music.playing { animation: pulse 2s ease-in-out infinite; }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 0 rgba(208,188,255,.5); }
+      50%      { box-shadow: 0 4px 16px rgba(0,0,0,.35), 0 0 0 12px rgba(208,188,255,0); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .bubble, .card { animation: none; }
+      .bubble, .card, .music.playing { animation: none; }
       .bubble { display: none; }
     }
   </style>
@@ -98,6 +140,8 @@
   <div class="bubbles" id="bubbles"></div>
 
   <main class="card">
+    <img class="avatar" src="avatar.jpg" alt="texmacros"
+         onerror="this.onerror=null;this.src='https://github.com/texmacros.png'">
     <h1>texmacros</h1>
     <p class="meta">13.10.2005 · tashkent</p>
 
@@ -117,6 +161,12 @@
     </div>
   </main>
 
+  <audio id="audio" src="music.mp3" loop preload="none"></audio>
+  <button class="music" id="music" aria-label="Музыка">
+    <svg class="play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+    <svg class="pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+
   <script>
     var box = document.getElementById('bubbles');
     for (var i = 0; i < 18; i++) {
@@ -130,6 +180,19 @@
       b.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
       box.appendChild(b);
     }
+
+    var audio = document.getElementById('audio');
+    var btn = document.getElementById('music');
+    btn.addEventListener('click', function () {
+      if (audio.paused) {
+        audio.play().then(function () {
+          btn.classList.add('playing');
+        }).catch(function () {});
+      } else {
+        audio.pause();
+        btn.classList.remove('playing');
+      }
+    });
   </script>
 </body>
 </html>
