@@ -240,8 +240,111 @@
     .btn:active { transform: scale(.96); }
     .btn.primary { background: #D0BCFF; color: #381E72; }
 
+    /* ---------- кнопки с фото ---------- */
+    .actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      animation: fadeUp .8s ease both;
+    }
+
+    .chip {
+      border: 0;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(74, 58, 99, .9);
+      color: #EADDFF;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform .2s ease;
+    }
+
+    .chip:active { transform: scale(.95); }
+
+    /* ---------- окно с фото ---------- */
+    .viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(18, 10, 28, .8);
+      backdrop-filter: blur(6px);
+    }
+
+    .viewer[hidden] { display: none; }
+
+    .viewer-box {
+      width: 100%;
+      max-width: 480px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #2B1B3D;
+      border-radius: 32px;
+      animation: fadeUp .3s ease both;
+    }
+
+    .viewer-img {
+      position: relative;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #1E1230;
+      border-radius: 24px;
+    }
+
+    .viewer-img img {
+      display: block;
+      width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      transition: opacity .2s ease;
+    }
+
+    .viewer-img img.loading { opacity: 0; }
+
+    .spinner {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border: 4px solid rgba(208,188,255,.25);
+      border-top-color: #D0BCFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .viewer-msg {
+      position: absolute;
+      padding: 0 20px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .viewer-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .viewer-bar .src {
+      margin-right: auto;
+      padding-left: 8px;
+      font-size: 12px;
+      color: #CCC2DC;
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      .bubble, .card, .player, .wave svg, .player.playing .cover { animation: none; }
+      .bubble, .card, .player, .actions, .viewer-box, .wave svg, .player.playing .cover { animation: none; }
       .bubble { display: none; }
     }
   </style>
@@ -291,6 +394,26 @@
       </a>
     </div>
   </main>
+
+  <div class="actions">
+    <button class="chip" data-kind="kpop">random k-pop photo</button>
+    <button class="chip" data-kind="cats">random cats photo</button>
+  </div>
+
+  <div class="viewer" id="viewer" hidden>
+    <div class="viewer-box">
+      <div class="viewer-img">
+        <img id="viewerImg" class="loading" alt="">
+        <div class="spinner" id="spinner"></div>
+        <div class="viewer-msg" id="viewerMsg" hidden></div>
+      </div>
+      <div class="viewer-bar">
+        <a class="src" id="viewerSrc" href="#" target="_blank" rel="noopener" hidden>источник</a>
+        <button class="chip" id="againBtn">ещё</button>
+        <button class="chip" id="closeBtn">закрыть</button>
+      </div>
+    </div>
+  </div>
 
   <audio id="audio" src="music.mp3" loop preload="metadata"></audio>
 
@@ -373,7 +496,6 @@
     audio.addEventListener('timeupdate', syncFromAudio);
     audio.addEventListener('loadedmetadata', syncFromAudio);
 
-    /* перемотка: нажатие и перетягивание */
     function ratioFrom(e) {
       var r = wave.getBoundingClientRect();
       return Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
@@ -400,6 +522,124 @@
     wave.addEventListener('pointercancel', function () {
       dragging = false;
       syncFromAudio();
+    });
+
+    /* случайные фото */
+    var viewer = document.getElementById('viewer');
+    var viewerImg = document.getElementById('viewerImg');
+    var spinner = document.getElementById('spinner');
+    var viewerMsg = document.getElementById('viewerMsg');
+    var viewerSrc = document.getElementById('viewerSrc');
+    var againBtn = document.getElementById('againBtn');
+    var closeBtn = document.getElementById('closeBtn');
+    var currentKind = null;
+    var token = 0;
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getCat() {
+      return fetch('https://api.thecatapi.com/v1/images/search')
+        .then(function (r) { return r.json(); })
+        .then(function (j) { return { url: j[0].url, link: null }; })
+        .catch(function () {
+          return { url: 'https://cataas.com/cat?t=' + Date.now(), link: null };
+        });
+    }
+
+    function getKpopOnce(offset) {
+      var queries = ['K-pop concert', 'K-pop idol', 'K-pop girl group', 'K-pop boy band'];
+      var q = pickRandom(queries) + ' filetype:bitmap';
+      var url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*'
+        + '&generator=search&gsrnamespace=6&gsrlimit=30&gsroffset=' + offset
+        + '&gsrsearch=' + encodeURIComponent(q)
+        + '&prop=imageinfo&iiprop=url|mime&iiurlwidth=900';
+      return fetch(url)
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var pages = j.query ? Object.keys(j.query.pages).map(function (k) { return j.query.pages[k]; }) : [];
+          pages = pages.filter(function (p) {
+            var i = p.imageinfo && p.imageinfo[0];
+            return i && /^image\/(jpeg|png)$/.test(i.mime) && i.thumburl;
+          });
+          if (!pages.length) return null;
+          var info = pickRandom(pages).imageinfo[0];
+          return { url: info.thumburl, link: info.descriptionurl };
+        });
+    }
+
+    function getKpop() {
+      var offsets = [Math.floor(Math.random() * 100), Math.floor(Math.random() * 30), 0];
+      var p = Promise.resolve(null);
+      offsets.forEach(function (off) {
+        p = p.then(function (res) { return res || getKpopOnce(off); });
+      });
+      return p.then(function (res) {
+        if (!res) throw new Error('empty');
+        return res;
+      });
+    }
+
+    function preload(url) {
+      return new Promise(function (resolve, reject) {
+        var im = new Image();
+        im.onload = function () { resolve(url); };
+        im.onerror = reject;
+        im.src = url;
+      });
+    }
+
+    function loadPhoto() {
+      var my = ++token;
+      viewerImg.classList.add('loading');
+      spinner.hidden = false;
+      viewerMsg.hidden = true;
+      viewerSrc.hidden = true;
+
+      var source = currentKind === 'cats' ? getCat() : getKpop();
+      source.then(function (res) {
+        return preload(res.url).then(function () { return res; });
+      }).then(function (res) {
+        if (my !== token) return;
+        viewerImg.src = res.url;
+        viewerImg.classList.remove('loading');
+        spinner.hidden = true;
+        if (res.link) {
+          viewerSrc.href = res.link;
+          viewerSrc.hidden = false;
+        }
+      }).catch(function () {
+        if (my !== token) return;
+        spinner.hidden = true;
+        viewerMsg.textContent = 'Не получилось загрузить фото. Нажми «ещё».';
+        viewerMsg.hidden = false;
+      });
+    }
+
+    function openViewer(kind) {
+      currentKind = kind;
+      viewer.hidden = false;
+      loadPhoto();
+    }
+
+    function closeViewer() {
+      token++;
+      viewer.hidden = true;
+      viewerImg.removeAttribute('src');
+    }
+
+    document.querySelectorAll('.chip[data-kind]').forEach(function (btn) {
+      btn.addEventListener('click', function () { openViewer(btn.dataset.kind); });
+    });
+
+    againBtn.addEventListener('click', loadPhoto);
+    closeBtn.addEventListener('click', closeViewer);
+    viewer.addEventListener('click', function (e) {
+      if (e.target === viewer) closeViewer();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !viewer.hidden) closeViewer();
     });
   </script>
 </body>
