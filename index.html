@@ -4,9 +4,99 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>texmacros</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #1E1230;
+      font-family: Roboto, Arial, sans-serif;
+      color: #CCC2DC;
+      overflow: hidden;
+    }
+
+    .bubbles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -140px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(208,188,255,.35), rgba(208,188,255,.06));
+      border: 1px solid rgba(208,188,255,.25);
+      animation: rise linear infinite;
+    }
+
+    @keyframes rise {
+      0%   { transform: translate(0, 0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translate(var(--drift), calc(-100vh - 280px)); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      padding: 48px 24px;
+      text-align: center;
+      background: rgba(43, 27, 61, .85);
+      backdrop-filter: blur(6px);
+      border-radius: 32px;
+      animation: fadeUp .8s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 { font-size: 44px; color: #EADDFF; }
+    .meta { margin-top: 8px; font-size: 18px; }
+
+    .links {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 999px;
+      background: #4A3A63;
+      color: #EADDFF;
+      text-decoration: none;
+      font-size: 16px;
+      transition: transform .2s ease;
+    }
+
+    .btn:active { transform: scale(.96); }
+    .btn.primary { background: #D0BCFF; color: #381E72; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bubble, .card { animation: none; }
+      .bubble { display: none; }
+    }
+  </style>
 </head>
 <body>
+  <div class="bubbles" id="bubbles"></div>
+
   <main class="card">
     <h1>texmacros</h1>
     <p class="meta">13.10.2005 · tashkent</p>
@@ -26,5 +116,20 @@
       </a>
     </div>
   </main>
+
+  <script>
+    var box = document.getElementById('bubbles');
+    for (var i = 0; i < 18; i++) {
+      var b = document.createElement('span');
+      var size = 20 + Math.random() * 70;
+      b.className = 'bubble';
+      b.style.width = b.style.height = size + 'px';
+      b.style.left = Math.random() * 100 + '%';
+      b.style.animationDuration = (9 + Math.random() * 10) + 's';
+      b.style.animationDelay = (-Math.random() * 18) + 's';
+      b.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+      box.appendChild(b);
+    }
+  </script>
 </body>
 </html>
