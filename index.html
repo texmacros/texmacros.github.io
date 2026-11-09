@@ -82,12 +82,21 @@
     .player.playing .play-btn .play { display: none; }
     .player.playing .play-btn .pause { display: block; }
 
+    .mid {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
     .wave {
       position: relative;
-      flex: 1;
-      height: 32px;
+      height: 28px;
       cursor: pointer;
-      overflow: hidden;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .wave-layer {
@@ -103,7 +112,7 @@
 
     .wave svg {
       display: block;
-      animation: flow 1s linear infinite;
+      animation: flow 3s linear infinite;
       animation-play-state: paused;
     }
 
@@ -111,17 +120,38 @@
 
     @keyframes flow {
       from { transform: translateX(0); }
-      to   { transform: translateX(-20px); }
+      to   { transform: translateX(-12px); }
     }
 
     .wave path {
       fill: none;
-      stroke-width: 4;
+      stroke-width: 3;
       stroke-linecap: round;
     }
 
     .wave-bg path { stroke: rgba(208,188,255,.3); }
     .wave-fg path { stroke: #D0BCFF; }
+
+    .thumb {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #EADDFF;
+      box-shadow: 0 0 0 3px rgba(208,188,255,.25);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .time {
+      font-size: 12px;
+      line-height: 14px;
+      text-align: right;
+      color: #CCC2DC;
+      font-variant-numeric: tabular-nums;
+    }
 
     .cover {
       flex: none;
@@ -225,9 +255,13 @@
       <svg class="pause" viewBox="0 0 24 24"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
     </button>
 
-    <div class="wave" id="wave">
-      <div class="wave-layer wave-bg"><svg><path/></svg></div>
-      <div class="wave-layer wave-fg" id="waveFg"><svg><path/></svg></div>
+    <div class="mid">
+      <div class="wave" id="wave">
+        <div class="wave-layer wave-bg"><svg><path/></svg></div>
+        <div class="wave-layer wave-fg" id="waveFg"><svg><path/></svg></div>
+        <div class="thumb" id="thumb"></div>
+      </div>
+      <div class="time" id="timeLeft">-:--</div>
     </div>
 
     <div class="cover">
@@ -275,21 +309,23 @@
       box.appendChild(b);
     }
 
-    /* волна */
+    /* волна (мелкая) */
     var wave = document.getElementById('wave');
     var waveFg = document.getElementById('waveFg');
+    var thumb = document.getElementById('thumb');
+    var timeLeft = document.getElementById('timeLeft');
     var svgs = wave.querySelectorAll('svg');
 
     function drawWave() {
       var W = wave.clientWidth;
-      var n = Math.ceil((W + 40) / 10) + 1;
-      var d = 'M0 16 q5 -8 10 0';
-      for (var i = 1; i < n; i++) d += ' t10 0';
+      var n = Math.ceil((W + 24) / 6) + 1;
+      var d = 'M0 14 q3 -4 6 0';
+      for (var k = 1; k < n; k++) d += ' t6 0';
       for (var j = 0; j < svgs.length; j++) {
         var s = svgs[j];
-        s.setAttribute('width', W + 40);
-        s.setAttribute('height', 32);
-        s.setAttribute('viewBox', '0 0 ' + (W + 40) + ' 32');
+        s.setAttribute('width', W + 24);
+        s.setAttribute('height', 28);
+        s.setAttribute('viewBox', '0 0 ' + (W + 24) + ' 28');
         s.querySelector('path').setAttribute('d', d);
       }
     }
@@ -300,6 +336,28 @@
     var audio = document.getElementById('audio');
     var player = document.getElementById('player');
     var playBtn = document.getElementById('playBtn');
+    var dragging = false;
+
+    function fmt(sec) {
+      sec = Math.max(0, Math.round(sec));
+      var m = Math.floor(sec / 60);
+      var s = sec % 60;
+      return '-' + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function show(ratio) {
+      var pct = ratio * 100;
+      waveFg.style.width = pct + '%';
+      thumb.style.left = pct + '%';
+      if (audio.duration) {
+        timeLeft.textContent = fmt(audio.duration * (1 - ratio));
+      }
+    }
+
+    function syncFromAudio() {
+      if (dragging || !audio.duration) return;
+      show(audio.currentTime / audio.duration);
+    }
 
     playBtn.addEventListener('click', function () {
       if (audio.paused) {
@@ -312,17 +370,36 @@
       }
     });
 
-    audio.addEventListener('timeupdate', function () {
-      if (audio.duration) {
-        waveFg.style.width = (audio.currentTime / audio.duration * 100) + '%';
-      }
+    audio.addEventListener('timeupdate', syncFromAudio);
+    audio.addEventListener('loadedmetadata', syncFromAudio);
+
+    /* перемотка: нажатие и перетягивание */
+    function ratioFrom(e) {
+      var r = wave.getBoundingClientRect();
+      return Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
+    }
+
+    wave.addEventListener('pointerdown', function (e) {
+      if (!audio.duration) return;
+      dragging = true;
+      wave.setPointerCapture(e.pointerId);
+      show(ratioFrom(e));
     });
 
-    wave.addEventListener('click', function (e) {
-      if (!audio.duration) return;
-      var r = wave.getBoundingClientRect();
-      var ratio = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
-      audio.currentTime = ratio * audio.duration;
+    wave.addEventListener('pointermove', function (e) {
+      if (dragging) show(ratioFrom(e));
+    });
+
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      audio.currentTime = ratioFrom(e) * audio.duration;
+    }
+
+    wave.addEventListener('pointerup', endDrag);
+    wave.addEventListener('pointercancel', function () {
+      dragging = false;
+      syncFromAudio();
     });
   </script>
 </body>
