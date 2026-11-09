@@ -16,7 +16,7 @@
       background: #1E1230;
       font-family: Roboto, Arial, sans-serif;
       color: #CCC2DC;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     .bubbles {
@@ -48,7 +48,7 @@
       z-index: 1;
       width: 100%;
       max-width: 520px;
-      padding: 40px 24px 48px;
+      padding: 40px 24px 32px;
       text-align: center;
       background: rgba(43, 27, 61, .85);
       backdrop-filter: blur(6px);
@@ -75,8 +75,54 @@
     h1 { font-size: 34px; color: #EADDFF; }
     .meta { margin-top: 8px; font-size: 18px; }
 
+    /* ---------- weather + rate tiles ---------- */
+    .info {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tile {
+      display: block;
+      padding: 14px 8px;
+      border-radius: 24px;
+      background: rgba(74, 58, 99, .55);
+      color: #EADDFF;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    a.tile { transition: transform .2s ease; }
+    a.tile:active { transform: scale(.97); }
+
+    .tile .label {
+      font-size: 12px;
+      letter-spacing: .04em;
+      color: #CCC2DC;
+    }
+
+    .tile .value {
+      margin-top: 6px;
+      font-size: clamp(18px, 5.2vw, 26px);
+      font-weight: 700;
+      line-height: 1.15;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tile .sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #CCC2DC;
+    }
+
+    .up   { color: #B5E2BE; }
+    .down { color: #F9B8B4; }
+
+    /* ---------- contacts ---------- */
     .links {
-      margin-top: 32px;
+      margin-top: 28px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -99,6 +145,14 @@
     .btn:active { transform: scale(.96); }
     .btn.primary { background: #D0BCFF; color: #381E72; }
 
+    .credit {
+      margin-top: 24px;
+      font-size: 11px;
+      color: rgba(204, 194, 220, .7);
+    }
+
+    .credit a { color: inherit; }
+
     @media (prefers-reduced-motion: reduce) {
       .bubble, .card { animation: none; }
       .bubble { display: none; }
@@ -114,6 +168,20 @@
     <h1>texmacros</h1>
     <p class="meta">13.10.2005 · tashkent</p>
 
+    <div class="info">
+      <div class="tile">
+        <div class="label">tashkent</div>
+        <div class="value" id="wValue">…</div>
+        <div class="sub" id="wSub">loading</div>
+      </div>
+
+      <a class="tile" href="https://cbu.uz/en/arkhiv-kursov-valyut/" target="_blank" rel="noopener">
+        <div class="label">usd · cbu</div>
+        <div class="value" id="rValue">…</div>
+        <div class="sub"><span id="rDiff"></span><span id="rDate">loading</span></div>
+      </a>
+    </div>
+
     <div class="links">
       <a class="btn primary" href="https://t.me/texmac">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
@@ -128,9 +196,15 @@
         +998 33 869 69 69
       </a>
     </div>
+
+    <p class="credit">
+      weather: <a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a>
+      · rate: <a href="https://cbu.uz" target="_blank" rel="noopener">cbu.uz</a>
+    </p>
   </main>
 
   <script>
+    /* bubbles */
     var box = document.getElementById('bubbles');
     for (var i = 0; i < 18; i++) {
       var b = document.createElement('span');
@@ -143,6 +217,123 @@
       b.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
       box.appendChild(b);
     }
+
+    /* helper: fetch JSON with a timeout */
+    function fetchJson(url, ms) {
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, ms);
+      return fetch(url, { signal: ctrl.signal }).then(function (r) {
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('bad response');
+        return r.json();
+      }, function (e) {
+        clearTimeout(timer);
+        throw e;
+      });
+    }
+
+    /* weather: Open-Meteo */
+    var wValue = document.getElementById('wValue');
+    var wSub = document.getElementById('wSub');
+
+    function describe(code, isDay) {
+      if (code === 0) return ['clear', isDay ? '\u2600\uFE0F' : '\uD83C\uDF19'];
+      if (code === 1) return ['mostly clear', isDay ? '\uD83C\uDF24\uFE0F' : '\uD83C\uDF19'];
+      if (code === 2) return ['partly cloudy', '\u26C5'];
+      if (code === 3) return ['overcast', '\u2601\uFE0F'];
+      if (code === 45 || code === 48) return ['fog', '\uD83C\uDF2B\uFE0F'];
+      if (code >= 51 && code <= 57) return ['drizzle', '\uD83C\uDF26\uFE0F'];
+      if (code >= 61 && code <= 67) return ['rain', '\uD83C\uDF27\uFE0F'];
+      if (code >= 71 && code <= 77) return ['snow', '\u2744\uFE0F'];
+      if (code >= 80 && code <= 82) return ['showers', '\uD83C\uDF26\uFE0F'];
+      if (code === 85 || code === 86) return ['snow showers', '\uD83C\uDF28\uFE0F'];
+      if (code >= 95) return ['thunderstorm', '\u26C8\uFE0F'];
+      return ['weather', '\uD83C\uDF21\uFE0F'];
+    }
+
+    function loadWeather() {
+      var url = 'https://api.open-meteo.com/v1/forecast'
+        + '?latitude=41.2995&longitude=69.2401'
+        + '&current=temperature_2m,apparent_temperature,weather_code,is_day'
+        + '&timezone=Asia%2FTashkent';
+      fetchJson(url, 8000).then(function (j) {
+        var c = j.current;
+        var d = describe(c.weather_code, c.is_day);
+        wValue.textContent = d[1] + ' ' + Math.round(c.temperature_2m) + '\u00B0';
+        wSub.textContent = d[0] + ' \u00B7 feels ' + Math.round(c.apparent_temperature) + '\u00B0';
+      }).catch(function () {
+        wValue.textContent = '\u2014';
+        wSub.textContent = 'unavailable';
+      });
+    }
+
+    loadWeather();
+    setInterval(loadWeather, 15 * 60 * 1000);
+
+    /* USD rate: Central Bank of Uzbekistan */
+    var rValue = document.getElementById('rValue');
+    var rDiff = document.getElementById('rDiff');
+    var rDate = document.getElementById('rDate');
+    var RATE_URL = 'https://cbu.uz/ru/arkhiv-kursov-valyut/json/USD/';
+    var CACHE_KEY = 'usd_cbu';
+
+    function dateValue(s) {
+      var p = String(s).split('.');
+      return new Date(+p[2], +p[1] - 1, +p[0]).getTime() || 0;
+    }
+
+    function showRate(item, saved) {
+      var rate = parseFloat(item.Rate);
+      var diff = parseFloat(item.Diff);
+      if (!rate) throw new Error('bad rate');
+
+      rValue.textContent = rate.toLocaleString('ru-RU', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      rDiff.className = '';
+      rDiff.textContent = '';
+      if (diff > 0) {
+        rDiff.className = 'up';
+        rDiff.textContent = '\u25B2 ' + diff.toFixed(2) + ' \u00B7 ';
+      } else if (diff < 0) {
+        rDiff.className = 'down';
+        rDiff.textContent = '\u25BC ' + Math.abs(diff).toFixed(2) + ' \u00B7 ';
+      }
+      rDate.textContent = item.Date + (saved ? ' (saved)' : '');
+    }
+
+    function loadRate() {
+      var cached = null;
+      try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) {}
+      if (cached) {
+        try { showRate(cached, true); } catch (e) {}
+      }
+
+      fetchJson(RATE_URL, 8000).then(function (data) {
+        var list = (Array.isArray(data) ? data : []).filter(function (x) {
+          return x && x.Ccy === 'USD';
+        });
+        if (!list.length) throw new Error('empty');
+        list.sort(function (a, b) { return dateValue(b.Date) - dateValue(a.Date); });
+        var item = list[0];
+        showRate(item, false);
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            Rate: item.Rate, Diff: item.Diff, Date: item.Date
+          }));
+        } catch (e) {}
+      }).catch(function () {
+        if (!cached) {
+          rValue.textContent = '\u2014';
+          rDiff.textContent = '';
+          rDate.textContent = 'unavailable';
+        }
+      });
+    }
+
+    loadRate();
   </script>
 </body>
 </html>
