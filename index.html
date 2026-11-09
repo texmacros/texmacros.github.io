@@ -401,6 +401,11 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
+      container-type: inline-size;
+      --pad: 20px;
+      --left-w: 124px;
+      --gap: 20px;
+      --logo: 112px;
       transition: background .4s ease;
     }
 
@@ -446,9 +451,95 @@
     }
 
     .exp-show {
+      flex-direction: row;
+      padding: 0 var(--pad);
       opacity: 0;
       transform: scale(.92);
       pointer-events: none;
+    }
+
+    .exp-left {
+      flex: none;
+      width: var(--left-w);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* the description opens from zero width, which pushes the logo to the left */
+    .exp-info {
+      flex: none;
+      max-width: 0;
+      margin-left: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-width .45s ease, margin-left .45s ease, opacity .3s ease;
+    }
+
+    .exp-info-in {
+      width: calc(100cqw - 2 * var(--pad) - var(--left-w) - var(--gap));
+      text-align: left;
+      clip-path: inset(0 100% 0 0);
+    }
+
+    .exp-info-in.in {
+      clip-path: inset(0 0 0 0);
+      transition: clip-path .55s ease .15s;
+    }
+
+    .exp-role {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgb(var(--accent-rgb));
+    }
+
+    .exp-list {
+      margin-top: 8px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .exp-list li {
+      position: relative;
+      padding-left: 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .exp-list li + li { margin-top: 5px; }
+
+    .exp-list li::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: .55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgb(var(--accent-rgb));
+    }
+
+    .exp.active .exp-info {
+      max-width: 400px;
+      margin-left: var(--gap);
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      .exp {
+        height: 260px;
+        --pad: 14px;
+        --left-w: 84px;
+        --gap: 12px;
+        --logo: 72px;
+      }
+
+      .exp-logo img { border-radius: 20px; }
+      .exp-name { font-size: 14px; }
+      .exp-role { font-size: 14px; }
+      .exp-list li { font-size: 12.5px; padding-left: 12px; }
+      .exp-list li + li { margin-top: 4px; }
     }
 
     .exp-logo {
@@ -456,8 +547,8 @@
       --my: 0px;
       --rot: 0deg;
       position: relative;
-      width: 112px;
-      height: 112px;
+      width: var(--logo);
+      height: var(--logo);
       transform: translate(var(--mx), var(--my)) rotate(var(--rot));
       transition: transform .18s ease-out;
     }
@@ -480,7 +571,8 @@
     .exp-logo img.on { opacity: 1; transform: none; }
 
     .exp-name {
-      margin-top: 16px;
+      margin-top: 14px;
+      text-align: center;
       font-size: 17px;
       font-weight: 500;
       color: var(--text);
@@ -512,7 +604,7 @@
     @media (prefers-reduced-motion: reduce) {
       .card, .panel, .lang-menu, .gridlayer, .blob { animation: none; }
       .bubble, .shape { display: none; }
-      .exp-idle, .exp-show, .exp-logo, .exp-logo img { transition: none; }
+      .exp-idle, .exp-show, .exp-logo, .exp-logo img, .exp-info, .exp-info-in.in { transition: none; }
     }
   </style>
 </head>
@@ -555,9 +647,17 @@
         <p class="exp-hint" id="expHint" data-i18n="expHint">hover and move the cursor</p>
       </div>
       <div class="exp-show" aria-live="polite">
-        <div class="exp-logo" id="expLogo"></div>
-        <p class="exp-name" id="expName"></p>
-        <div class="exp-dots" id="expDots"></div>
+        <div class="exp-left">
+          <div class="exp-logo" id="expLogo"></div>
+          <p class="exp-name" id="expName"></p>
+          <div class="exp-dots" id="expDots"></div>
+        </div>
+        <div class="exp-info">
+          <div class="exp-info-in" id="expInfo">
+            <p class="exp-role" id="expRole"></p>
+            <ul class="exp-list" id="expList"></ul>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -803,22 +903,67 @@
       bgOpts.querySelectorAll('[data-mode]').forEach(function (b) {
         b.textContent = d.modes[MODES.indexOf(b.getAttribute('data-mode'))];
       });
+
+      if (current >= 0) renderJob(false);
     }
 
     /* ---------- work experience ---------- */
     var COMPANIES = [
-      { name: 'Uzum Tezkor', logo: 'logos/uzum-tezkor.png' },
-      { name: 'KFC',         logo: 'logos/kfc.png' },
-      { name: 'Express24',   logo: 'logos/express24.png' },
-      { name: 'Cold Stone',  logo: 'logos/cold-stone.svg', pad: true },
-      { name: 'Dodo Pizza',  logo: 'logos/dodo-pizza.png' },
-      { name: 'Yandex Taxi', logo: 'logos/yandex-taxi.png' }
+      { name: 'Uzum Tezkor', logo: 'logos/uzum-tezkor.png', job: 'support' },
+      { name: 'KFC',         logo: 'logos/kfc.png',         job: 'support' },
+      { name: 'Express24',   logo: 'logos/express24.png',   job: 'support' },
+      { name: 'Cold Stone',  logo: 'logos/cold-stone.svg',  job: 'ops', pad: true },
+      { name: 'Dodo Pizza',  logo: 'logos/dodo-pizza.png',  job: 'support' },
+      { name: 'Yandex Taxi', logo: 'logos/yandex-taxi.png', job: 'drivers' }
     ];
+
+    // what I did at each place: first line is the area of work, the rest are duties
+    var JOBS = {
+      support: {
+        en: ['Support team', 'Communication with customers, couriers and partners', 'Monitoring orders and delivery progress', 'Resolving issues promptly'],
+        ru: ['Служба поддержки', 'Общение с клиентами, курьерами и партнёрами', 'Мониторинг заказов и хода доставки', 'Оперативное решение возникающих проблем'],
+        uz: ['Qoʻllab-quvvatlash xizmati', 'Mijozlar, kuryerlar va hamkorlar bilan muloqot', 'Buyurtmalar va yetkazib berish jarayonini kuzatish', 'Muammolarni tezkor hal qilish'],
+        tr: ['Destek ekibi', 'Müşteriler, kuryeler ve iş ortaklarıyla iletişim', 'Sipariş ve teslimat sürecinin takibi', 'Sorunların hızlı çözümü'],
+        kk: ['Қолдау қызметі', 'Клиенттермен, курьерлермен және серіктестермен байланыс', 'Тапсырыстар мен жеткізу барысын бақылау', 'Мәселелерді жедел шешу'],
+        ko: ['고객 지원', '고객·배달원·파트너사와 소통', '주문 및 배달 진행 상황 모니터링', '문제의 신속한 해결'],
+        zh: ['客服支持', '与客户、骑手和合作伙伴沟通', '跟踪订单与配送进度', '及时解决各类问题'],
+        es: ['Atención al cliente', 'Comunicación con clientes, repartidores y socios', 'Seguimiento de pedidos y entregas', 'Resolución ágil de incidencias'],
+        de: ['Kundensupport', 'Kommunikation mit Kunden, Kurieren und Partnern', 'Überwachung von Bestellungen und Lieferungen', 'Schnelle Lösung von Problemen'],
+        fr: ['Support client', 'Communication avec les clients, les livreurs et les partenaires', 'Suivi des commandes et des livraisons', 'Résolution rapide des incidents']
+      },
+      drivers: {
+        en: ['Driver support', 'Communication with driver partners', 'Help with financial requests'],
+        ru: ['Поддержка водителей', 'Общение с водителями-партнёрами', 'Помощь с финансовыми запросами'],
+        uz: ['Haydovchilarni qoʻllab-quvvatlash', 'Hamkor haydovchilar bilan muloqot', 'Moliyaviy soʻrovlar boʻyicha yordam'],
+        tr: ['Sürücü desteği', 'Sürücü ortaklarla iletişim', 'Finansal taleplerde destek'],
+        kk: ['Жүргізушілерді қолдау', 'Серіктес жүргізушілермен байланыс', 'Қаржылық сұраныстар бойынша көмек'],
+        ko: ['기사 지원', '파트너 기사와 소통', '정산 등 금융 관련 문의 지원'],
+        zh: ['司机支持', '与合作司机沟通', '协助处理财务相关请求'],
+        es: ['Soporte a conductores', 'Comunicación con conductores asociados', 'Ayuda con consultas financieras'],
+        de: ['Fahrersupport', 'Kommunikation mit Partnerfahrern', 'Hilfe bei finanziellen Anfragen'],
+        fr: ['Support chauffeurs', 'Communication avec les chauffeurs partenaires', 'Aide pour les demandes financières']
+      },
+      ops: {
+        en: ['Operations', 'Setting up and managing deliveries', 'Tracking invoices: income and expenses', 'Overseeing the POS system and rolling out changes'],
+        ru: ['Операционная работа', 'Организация и контроль доставки', 'Учёт накладных: приход и расход', 'Контроль кассовой системы и внедрение изменений'],
+        uz: ['Operatsion faoliyat', 'Yetkazib berishni tashkil etish va nazorat qilish', 'Yuk xatlari hisobi: kirim va chiqim', 'Kassa tizimini nazorat qilish va oʻzgarishlarni joriy etish'],
+        tr: ['Operasyon', 'Teslimat sürecinin kurulması ve yönetimi', 'Faturaların takibi: gelir ve giderler', 'Kasa sisteminin denetimi ve iyileştirmelerin uygulanması'],
+        kk: ['Операциялық жұмыс', 'Жеткізуді ұйымдастыру және бақылау', 'Жүкқұжаттар есебі: кіріс және шығыс', 'Касса жүйесін бақылау және өзгерістер енгізу'],
+        ko: ['운영 관리', '배달 프로세스 구축 및 관리', '송장 관리: 수입과 지출', 'POS 시스템 관리 및 개선 도입'],
+        zh: ['运营管理', '搭建并管理配送流程', '管理进出货单据：收入与支出', '监管收银系统并推动改进'],
+        es: ['Operaciones', 'Organización y control de las entregas', 'Control de albaranes: ingresos y gastos', 'Supervisión del sistema de caja e implantación de mejoras'],
+        de: ['Betriebsabläufe', 'Aufbau und Steuerung der Lieferungen', 'Belegverwaltung: Einnahmen und Ausgaben', 'Betreuung des Kassensystems und Einführung von Änderungen'],
+        fr: ['Opérations', 'Mise en place et suivi des livraisons', 'Suivi des factures : recettes et dépenses', 'Supervision du système de caisse et mise en place d’améliorations']
+      }
+    };
 
     var exp = document.getElementById('exp');
     var expLogo = document.getElementById('expLogo');
     var expName = document.getElementById('expName');
     var expDots = document.getElementById('expDots');
+    var expInfo = document.getElementById('expInfo');
+    var expRole = document.getElementById('expRole');
+    var expList = document.getElementById('expList');
     var canHover = window.matchMedia('(hover: hover)').matches;
     var current = -1;
 
@@ -839,6 +984,25 @@
       expLogo.querySelectorAll('img').forEach(function (img, k) { img.classList.toggle('on', k === i); });
       expDots.querySelectorAll('i').forEach(function (d, k) { d.classList.toggle('on', k === i); });
       expName.textContent = COMPANIES[i].name;
+      renderJob(true);
+    }
+
+    // fills the description; with replay it slides in again from left to right
+    function renderJob(replay) {
+      var job = JOBS[COMPANIES[current].job];
+      var lines = job[lang] || job.en;
+      expRole.textContent = lines[0];
+      expList.innerHTML = '';
+      lines.slice(1).forEach(function (t) {
+        var li = document.createElement('li');
+        li.textContent = t;
+        expList.appendChild(li);
+      });
+      if (replay) {
+        expInfo.classList.remove('in');
+        void expInfo.offsetWidth;
+        expInfo.classList.add('in');
+      }
     }
 
     function openExp(i) {
@@ -861,9 +1025,9 @@
       openExp(Math.floor(x * COMPANIES.length));
       exp.style.setProperty('--gx', x * 100 + '%');
       exp.style.setProperty('--gy', y * 100 + '%');
-      expLogo.style.setProperty('--mx', (x - 0.5) * 60 + 'px');
-      expLogo.style.setProperty('--my', (y - 0.5) * 24 + 'px');
-      expLogo.style.setProperty('--rot', (x - 0.5) * 14 + 'deg');
+      expLogo.style.setProperty('--mx', (x - 0.5) * 12 + 'px');
+      expLogo.style.setProperty('--my', (y - 0.5) * 14 + 'px');
+      expLogo.style.setProperty('--rot', (x - 0.5) * 10 + 'deg');
     }
 
     // on touch screens a finger swipe scrubs through the logos, a plain tap goes to the next one
