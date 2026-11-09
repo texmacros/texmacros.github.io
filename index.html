@@ -3,56 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1E1230" id="themeColor">
   <title>texmacros</title>
   <style>
-    /* ---------- color themes ---------- */
-    :root {
-      --accent-rgb: 208,188,255;
-      --bg: #1E1230;
-      --surface: rgba(43, 27, 61, .85);
-      --surface2: #4A3A63;
-      --tile: rgba(74, 58, 99, .55);
-      --text: #EADDFF;
-      --text2: #CCC2DC;
-      --on-accent: #381E72;
-      --up: #B5E2BE;
-      --down: #F9B8B4;
-    }
-
-    html[data-theme="brown"] {
-      --accent-rgb: 232,191,168;
-      --bg: #1F140F;
-      --surface: rgba(52, 35, 27, .88);
-      --surface2: #5A4034;
-      --tile: rgba(90, 64, 52, .55);
-      --text: #FBE5DA;
-      --text2: #D8C2B8;
-      --on-accent: #3F2517;
-    }
-
-    html[data-theme="teal"] {
-      --accent-rgb: 159,214,206;
-      --bg: #0E1D1B;
-      --surface: rgba(23, 45, 42, .88);
-      --surface2: #2F4F4A;
-      --tile: rgba(47, 79, 74, .55);
-      --text: #D6F2EE;
-      --text2: #B2CCC8;
-      --on-accent: #00372F;
-    }
-
-    html[data-theme="blue"] {
-      --accent-rgb: 174,198,255;
-      --bg: #0F1829;
-      --surface: rgba(24, 36, 64, .88);
-      --surface2: #33466E;
-      --tile: rgba(51, 70, 110, .55);
-      --text: #DCE6FF;
-      --text2: #B9C6E4;
-      --on-accent: #0B2A63;
-    }
-
     * { box-sizing: border-box; margin: 0; }
 
     body {
@@ -60,16 +12,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px 20px 88px;
-      background: var(--bg);
+      padding: 20px;
+      background: #1E1230;
       font-family: Roboto, Arial, sans-serif;
-      color: var(--text2);
+      color: #CCC2DC;
       overflow-x: hidden;
-      transition: background .4s ease;
     }
 
-    /* ---------- animated background ---------- */
-    .bg {
+    .bubbles {
       position: fixed;
       inset: 0;
       z-index: 0;
@@ -81,8 +31,8 @@
       position: absolute;
       bottom: -140px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(var(--accent-rgb), .35), rgba(var(--accent-rgb), .06));
-      border: 1px solid rgba(var(--accent-rgb), .25);
+      background: radial-gradient(circle at 30% 30%, rgba(208,188,255,.35), rgba(208,188,255,.06));
+      border: 1px solid rgba(208,188,255,.25);
       animation: rise linear infinite;
     }
 
@@ -93,159 +43,41 @@
       100% { transform: translate(var(--drift), calc(-100vh - 280px)); opacity: 0; }
     }
 
-    .shape {
-      position: absolute;
-      bottom: -120px;
-      color: rgb(var(--accent-rgb));
-      opacity: 0;
-      animation: float linear infinite;
-    }
-
-    .shape svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      animation: turn var(--dur, 20s) linear infinite;
-    }
-
-    @keyframes float {
-      0%   { transform: translate(0, 0); opacity: 0; }
-      10%  { opacity: var(--o, .2); }
-      90%  { opacity: var(--o, .2); }
-      100% { transform: translate(var(--drift), calc(-100vh - 240px)); opacity: 0; }
-    }
-
-    @keyframes turn {
-      to { transform: rotate(var(--turn, 360deg)); }
-    }
-
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(70px);
-      will-change: transform;
-    }
-
-    .blob.b1 {
-      width: 70vmax; height: 70vmax;
-      left: -20vmax; top: -20vmax;
-      background: rgba(var(--accent-rgb), .22);
-      animation: drift1 22s ease-in-out infinite alternate;
-    }
-
-    .blob.b2 {
-      width: 60vmax; height: 60vmax;
-      right: -22vmax; top: 25vh;
-      background: var(--surface2);
-      opacity: .6;
-      animation: drift2 26s ease-in-out infinite alternate;
-    }
-
-    .blob.b3 {
-      width: 55vmax; height: 55vmax;
-      left: 8vmax; bottom: -28vmax;
-      background: rgba(var(--accent-rgb), .15);
-      animation: drift3 30s ease-in-out infinite alternate;
-    }
-
-    @keyframes drift1 { to { transform: translate(18vmax, 12vmax) scale(1.15); } }
-    @keyframes drift2 { to { transform: translate(-16vmax, -10vmax) scale(1.1); } }
-    @keyframes drift3 { to { transform: translate(14vmax, -14vmax) scale(1.2); } }
-
-    .gridlayer {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(var(--accent-rgb), .32) 1.2px, transparent 1.6px);
-      background-size: 26px 26px;
-      -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 25%, transparent 78%);
-      mask-image: radial-gradient(ellipse at 50% 40%, #000 25%, transparent 78%);
-      animation: gridmove 40s linear infinite;
-    }
-
-    @keyframes gridmove {
-      to { background-position: 26px 26px; }
-    }
-
-    /* ---------- page layout ---------- */
-    .page {
+    .card {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 560px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .rise-in {
-      animation: fadeUp .7s ease both;
-      animation-delay: calc(var(--i, 0) * 80ms);
+      max-width: 520px;
+      padding: 40px 24px 32px;
+      text-align: center;
+      background: rgba(43, 27, 61, .85);
+      backdrop-filter: blur(6px);
+      border-radius: 32px;
+      animation: fadeUp .8s ease both;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
+      from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .card {
-      background: var(--surface);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: 28px;
-      padding: 20px;
-      transition: background .4s ease;
-    }
-
-    .section-label {
-      padding-left: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text2);
-      opacity: .8;
-    }
-
-    /* ---------- hero ---------- */
-    .hero {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
     .avatar {
-      flex: none;
-      width: 88px;
-      height: 88px;
+      display: block;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 20px;
       object-fit: cover;
       border-radius: 36%;
-      border: 3px solid var(--surface2);
-      background: var(--surface2);
+      border: 3px solid #4A3A63;
+      background: #4A3A63;
     }
 
-    h1 {
-      font-size: 30px;
-      line-height: 1.1;
-      color: var(--text);
-    }
-
-    .chips {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: var(--surface2);
-      color: var(--text);
-      font-size: 13px;
-    }
+    h1 { font-size: 34px; color: #EADDFF; }
+    .meta { margin-top: 8px; font-size: 18px; }
 
     /* ---------- weather + rate tiles ---------- */
     .info {
+      margin-top: 28px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
@@ -253,28 +85,25 @@
 
     .tile {
       display: block;
-      padding: 16px;
+      padding: 14px 8px;
       border-radius: 24px;
-      background: var(--tile);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      color: var(--text);
+      background: rgba(74, 58, 99, .55);
+      color: #EADDFF;
       text-decoration: none;
-      text-align: left;
-      transition: background .4s ease;
+      text-align: center;
     }
 
-    a.tile { transition: transform .2s ease, background .4s ease; }
+    a.tile { transition: transform .2s ease; }
     a.tile:active { transform: scale(.97); }
 
     .tile .label {
       font-size: 12px;
       letter-spacing: .04em;
-      color: var(--text2);
+      color: #CCC2DC;
     }
 
     .tile .value {
-      margin-top: 8px;
+      margin-top: 6px;
       font-size: clamp(18px, 5.2vw, 26px);
       font-weight: 700;
       line-height: 1.15;
@@ -283,208 +112,63 @@
     }
 
     .tile .sub {
-      margin-top: 8px;
+      margin-top: 6px;
       font-size: 12px;
-      color: var(--text2);
+      color: #CCC2DC;
     }
 
-    .up   { color: var(--up); }
-    .down { color: var(--down); }
+    .up   { color: #B5E2BE; }
+    .down { color: #F9B8B4; }
 
     /* ---------- contacts ---------- */
-    .list {
+    .links {
+      margin-top: 28px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding: 10px;
+      gap: 12px;
+      align-items: center;
     }
 
-    .item {
-      display: flex;
+    .btn {
+      display: inline-flex;
       align-items: center;
-      gap: 14px;
-      padding: 10px 12px;
-      border-radius: 20px;
-      background: var(--tile);
-      color: var(--text);
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 999px;
+      background: #4A3A63;
+      color: #EADDFF;
       text-decoration: none;
-      transition: transform .2s ease, background .4s ease;
-    }
-
-    .item:active { transform: scale(.98); }
-
-    .ico {
-      flex: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgb(var(--accent-rgb));
-      color: var(--on-accent);
-    }
-
-    .ico svg { width: 22px; height: 22px; }
-
-    .txt {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .txt b {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .04em;
-      color: var(--text2);
-    }
-
-    .txt span {
       font-size: 16px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      transition: transform .2s ease;
     }
 
-    .chev {
-      flex: none;
-      width: 20px;
-      height: 20px;
-      color: var(--text2);
-    }
+    .btn:active { transform: scale(.96); }
+    .btn.primary { background: #D0BCFF; color: #381E72; }
 
     .credit {
-      text-align: center;
+      margin-top: 24px;
       font-size: 11px;
-      color: var(--text2);
-      opacity: .7;
+      color: rgba(204, 194, 220, .7);
     }
 
     .credit a { color: inherit; }
 
-    /* ---------- appearance panel ---------- */
-    .fab {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      z-index: 6;
-      width: 56px;
-      height: 56px;
-      border: 0;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgb(var(--accent-rgb));
-      color: var(--on-accent);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
-      cursor: pointer;
-      transition: transform .2s ease;
-    }
-
-    .fab:active { transform: scale(.92); }
-    .fab svg { width: 26px; height: 26px; }
-
-    .panel {
-      position: fixed;
-      right: 16px;
-      bottom: 84px;
-      z-index: 6;
-      width: min(300px, calc(100vw - 32px));
-      padding: 16px;
-      border-radius: 28px;
-      background: var(--bg);
-      border: 1px solid rgba(var(--accent-rgb), .25);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, .45);
-      animation: fadeUp .25s ease both;
-    }
-
-    .panel[hidden] { display: none; }
-
-    .p-title {
-      margin: 4px 0 10px;
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text2);
-    }
-
-    .p-title:not(:first-child) { margin-top: 16px; }
-
-    .opts {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .opt {
-      border: 0;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: var(--tile);
-      color: var(--text);
-      font: inherit;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform .2s ease;
-    }
-
-    .opt:active { transform: scale(.95); }
-
-    .opt.on {
-      background: rgb(var(--accent-rgb));
-      color: var(--on-accent);
-    }
-
-    .swatches {
-      display: flex;
-      gap: 12px;
-    }
-
-    .sw {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      cursor: pointer;
-      transition: transform .2s ease;
-    }
-
-    .sw:active { transform: scale(.9); }
-    .sw.on { border-color: var(--text); }
-    .sw[data-pick="purple"] { background: #D0BCFF; }
-    .sw[data-pick="brown"]  { background: #E8BFA8; }
-    .sw[data-pick="teal"]   { background: #9FD6CE; }
-    .sw[data-pick="blue"]   { background: #AEC6FF; }
-
     @media (prefers-reduced-motion: reduce) {
-      .rise-in, .panel, .gridlayer, .blob { animation: none; }
-      .bubble, .shape { display: none; }
+      .bubble, .card { animation: none; }
+      .bubble { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div>
+  <div class="bubbles" id="bubbles"></div>
 
-  <main class="page">
-    <section class="card hero rise-in" style="--i:0">
-      <img class="avatar" src="avatar.jpg" alt="texmacros"
-           onerror="this.onerror=null;this.src='https://github.com/texmacros.png'">
-      <div>
-        <h1>texmacros</h1>
-        <div class="chips">
-          <span class="chip">13.10.2005</span>
-          <span class="chip">tashkent</span>
-        </div>
-      </div>
-    </section>
+  <main class="card">
+    <img class="avatar" src="avatar.jpg" alt="texmacros"
+         onerror="this.onerror=null;this.src='https://github.com/texmacros.png'">
+    <h1>texmacros</h1>
+    <p class="meta">13.10.2005 · tashkent</p>
 
-    <h2 class="section-label rise-in" style="--i:1">today</h2>
-
-    <section class="info rise-in" style="--i:2">
+    <div class="info">
       <div class="tile">
         <div class="label">tashkent</div>
         <div class="value" id="wValue">…</div>
@@ -496,209 +180,45 @@
         <div class="value" id="rValue">…</div>
         <div class="sub"><span id="rDiff"></span><span id="rDate">loading</span></div>
       </a>
-    </section>
+    </div>
 
-    <h2 class="section-label rise-in" style="--i:3">contacts</h2>
-
-    <section class="card list rise-in" style="--i:4">
-      <a class="item" href="https://t.me/texmac">
-        <span class="ico">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
-        </span>
-        <span class="txt"><b>telegram</b><span>@texmac</span></span>
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="links">
+      <a class="btn primary" href="https://t.me/texmac">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M9.78,18.65L10.06,14.42L17.74,7.5C18.08,7.19 17.67,7.04 17.22,7.31L7.74,13.3L3.64,12C2.76,11.75 2.75,11.14 3.84,10.7L19.81,4.54C20.54,4.21 21.24,4.72 20.96,5.84L18.24,18.65C18.05,19.56 17.5,19.78 16.74,19.36L12.6,16.3L10.61,18.23C10.38,18.46 10.19,18.65 9.78,18.65Z"/></svg>
+        @texmac
       </a>
-
-      <a class="item" href="mailto:texmacros@gmail.com">
-        <span class="ico">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-        </span>
-        <span class="txt"><b>email</b><span>texmacros@gmail.com</span></span>
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <a class="btn" href="mailto:texmacros@gmail.com">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        texmacros@gmail.com
       </a>
-
-      <a class="item" href="tel:+998338696969">
-        <span class="ico">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </span>
-        <span class="txt"><b>phone</b><span>+998 33 869 69 69</span></span>
-        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <a class="btn" href="tel:+998338696969">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        +998 33 869 69 69
       </a>
-    </section>
+    </div>
 
-    <p class="credit rise-in" style="--i:5">
+    <p class="credit">
       weather: <a href="https://open-meteo.com" target="_blank" rel="noopener">open-meteo.com</a>
       · rate: <a href="https://cbu.uz" target="_blank" rel="noopener">cbu.uz</a>
     </p>
   </main>
 
-  <button class="fab" id="fab" aria-label="Appearance" aria-expanded="false">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-  </button>
-
-  <div class="panel" id="panel" hidden>
-    <p class="p-title">background</p>
-    <div class="opts" id="bgOpts">
-      <button class="opt" data-mode="shapes">shapes</button>
-      <button class="opt" data-mode="bubbles">bubbles</button>
-      <button class="opt" data-mode="aurora">aurora</button>
-      <button class="opt" data-mode="grid">grid</button>
-      <button class="opt" data-mode="plain">plain</button>
-    </div>
-
-    <p class="p-title">color</p>
-    <div class="swatches" id="themeOpts">
-      <button class="sw" data-pick="purple" aria-label="purple"></button>
-      <button class="sw" data-pick="brown" aria-label="brown"></button>
-      <button class="sw" data-pick="teal" aria-label="teal"></button>
-      <button class="sw" data-pick="blue" aria-label="blue"></button>
-    </div>
-  </div>
-
   <script>
-    function pickRandom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function loadSetting(key, allowed, fallback) {
-      try {
-        var v = localStorage.getItem(key);
-        if (v && allowed.indexOf(v) !== -1) return v;
-      } catch (e) {}
-      return fallback;
-    }
-
-    function saveSetting(key, value) {
-      try { localStorage.setItem(key, value); } catch (e) {}
-    }
-
-    /* ---------- background modes ---------- */
-    var MODES = ['shapes', 'bubbles', 'aurora', 'grid', 'plain'];
-    var THEMES = ['purple', 'brown', 'teal', 'blue'];
-    var bg = document.getElementById('bg');
-
-    var SHAPES = [
-      '<circle cx="12" cy="12" r="11"/>',
-      '<rect x="2" y="2" width="20" height="20" rx="6"/>',
-      '<polygon points="12,4 21,20 3,20" stroke-width="3"/>',
-      '<polygon points="12,2 22,12 12,22 2,12" stroke-width="3"/>',
-      '<path d="M12 1Q13.5 10.5 23 12Q13.5 13.5 12 23Q10.5 13.5 1 12Q10.5 10.5 12 1Z"/>',
-      '<circle cx="12" cy="6.5" r="5"/><circle cx="12" cy="17.5" r="5"/><circle cx="6.5" cy="12" r="5"/><circle cx="17.5" cy="12" r="5"/>',
-      '<circle cx="12" cy="12" r="8.5" fill="none" stroke-width="3"/>',
-      '<rect x="1" y="7" width="22" height="10" rx="5"/>',
-      '<polygon points="12,2 21,7 21,17 12,22 3,17 3,7" stroke-width="3"/>'
-    ];
-
-    function makeShape() {
-      var el = document.createElement('span');
-      var size = 28 + Math.random() * 56;
-      var dur = 14 + Math.random() * 14;
-      var dir = Math.random() < 0.5 ? -1 : 1;
-      el.className = 'shape';
-      el.style.width = el.style.height = size + 'px';
-      el.style.left = Math.random() * 100 + '%';
-      el.style.animationDuration = dur + 's';
-      el.style.animationDelay = (-Math.random() * dur) + 's';
-      el.style.setProperty('--drift', (Math.random() * 120 - 60) + 'px');
-      el.style.setProperty('--o', (0.14 + Math.random() * 0.2).toFixed(2));
-      el.style.setProperty('--dur', (10 + Math.random() * 14) + 's');
-      el.style.setProperty('--turn', dir * (180 + Math.random() * 360) + 'deg');
-      el.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" '
-        + 'stroke-linejoin="round" stroke-width="1">' + pickRandom(SHAPES) + '</svg>';
-      return el;
-    }
-
-    function makeBubble() {
-      var el = document.createElement('span');
+    /* bubbles */
+    var box = document.getElementById('bubbles');
+    for (var i = 0; i < 18; i++) {
+      var b = document.createElement('span');
       var size = 20 + Math.random() * 70;
-      el.className = 'bubble';
-      el.style.width = el.style.height = size + 'px';
-      el.style.left = Math.random() * 100 + '%';
-      el.style.animationDuration = (9 + Math.random() * 10) + 's';
-      el.style.animationDelay = (-Math.random() * 18) + 's';
-      el.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-      return el;
+      b.className = 'bubble';
+      b.style.width = b.style.height = size + 'px';
+      b.style.left = Math.random() * 100 + '%';
+      b.style.animationDuration = (9 + Math.random() * 10) + 's';
+      b.style.animationDelay = (-Math.random() * 18) + 's';
+      b.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+      box.appendChild(b);
     }
 
-    function addEl(cls) {
-      var el = document.createElement('span');
-      el.className = cls;
-      bg.appendChild(el);
-    }
-
-    function renderBg(mode) {
-      bg.innerHTML = '';
-      var i;
-      if (mode === 'shapes') {
-        for (i = 0; i < 16; i++) bg.appendChild(makeShape());
-      } else if (mode === 'bubbles') {
-        for (i = 0; i < 18; i++) bg.appendChild(makeBubble());
-      } else if (mode === 'aurora') {
-        addEl('blob b1'); addEl('blob b2'); addEl('blob b3');
-      } else if (mode === 'grid') {
-        addEl('gridlayer');
-      }
-    }
-
-    /* ---------- appearance panel ---------- */
-    var fab = document.getElementById('fab');
-    var panel = document.getElementById('panel');
-    var bgOpts = document.getElementById('bgOpts');
-    var themeOpts = document.getElementById('themeOpts');
-    var themeColor = document.getElementById('themeColor');
-
-    function markActive(container, attr, value) {
-      container.querySelectorAll('[' + attr + ']').forEach(function (b) {
-        b.classList.toggle('on', b.getAttribute(attr) === value);
-      });
-    }
-
-    function setMode(mode) {
-      renderBg(mode);
-      markActive(bgOpts, 'data-mode', mode);
-      saveSetting('bg', mode);
-    }
-
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      markActive(themeOpts, 'data-pick', theme);
-      saveSetting('theme', theme);
-      var c = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if (c) themeColor.setAttribute('content', c);
-    }
-
-    function togglePanel(open) {
-      var show = typeof open === 'boolean' ? open : panel.hidden;
-      panel.hidden = !show;
-      fab.setAttribute('aria-expanded', show ? 'true' : 'false');
-    }
-
-    fab.addEventListener('click', function (e) {
-      e.stopPropagation();
-      togglePanel();
-    });
-
-    panel.addEventListener('click', function (e) { e.stopPropagation(); });
-
-    bgOpts.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-mode]');
-      if (btn) setMode(btn.getAttribute('data-mode'));
-    });
-
-    themeOpts.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-pick]');
-      if (btn) setTheme(btn.getAttribute('data-pick'));
-    });
-
-    document.addEventListener('click', function () { togglePanel(false); });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') togglePanel(false);
-    });
-
-    setTheme(loadSetting('theme', THEMES, 'purple'));
-    setMode(loadSetting('bg', MODES, 'shapes'));
-
-    /* ---------- helper: fetch JSON with a timeout ---------- */
+    /* helper: fetch JSON with a timeout */
     function fetchJson(url, ms) {
       var ctrl = new AbortController();
       var timer = setTimeout(function () { ctrl.abort(); }, ms);
@@ -712,7 +232,7 @@
       });
     }
 
-    /* ---------- weather: Open-Meteo ---------- */
+    /* weather: Open-Meteo */
     var wValue = document.getElementById('wValue');
     var wSub = document.getElementById('wSub');
 
@@ -750,7 +270,7 @@
     loadWeather();
     setInterval(loadWeather, 15 * 60 * 1000);
 
-    /* ---------- USD rate: Central Bank of Uzbekistan ---------- */
+    /* USD rate: Central Bank of Uzbekistan */
     var rValue = document.getElementById('rValue');
     var rDiff = document.getElementById('rDiff');
     var rDate = document.getElementById('rDate');
