@@ -145,10 +145,31 @@
       pointer-events: none;
     }
 
-    .time {
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 14px;
+    }
+
+    .track {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       font-size: 12px;
       line-height: 14px;
-      text-align: right;
+      color: #CCC2DC;
+      text-decoration: none;
+    }
+
+    .track[hidden] { display: none; }
+
+    .time {
+      margin-left: auto;
+      font-size: 12px;
+      line-height: 14px;
       color: #CCC2DC;
       font-variant-numeric: tabular-nums;
     }
@@ -240,10 +261,12 @@
     .btn:active { transform: scale(.96); }
     .btn.primary { background: #D0BCFF; color: #381E72; }
 
-    /* ---------- photo buttons ---------- */
+    /* ---------- action buttons ---------- */
     .actions {
       position: relative;
       z-index: 1;
+      width: 100%;
+      max-width: 520px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -367,12 +390,15 @@
         <div class="wave-layer wave-fg" id="waveFg"><svg><path/></svg></div>
         <div class="thumb" id="thumb"></div>
       </div>
-      <div class="time" id="timeLeft">-:--</div>
+      <div class="row">
+        <a class="track" id="track" href="#" target="_blank" rel="noopener" hidden></a>
+        <span class="time" id="timeLeft">-:--</span>
+      </div>
     </div>
 
     <div class="cover">
       <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
-      <img src="cover.jpg" alt="" onerror="this.style.display='none'">
+      <img id="coverImg" src="cover.jpg" alt="" onerror="this.style.display='none'">
     </div>
   </div>
 
@@ -401,6 +427,8 @@
   <div class="actions">
     <button class="chip" data-kind="babymonster">random babymonster photo</button>
     <button class="chip" data-kind="cats">random cats photo</button>
+    <button class="chip" data-kind="anime">random anime photo</button>
+    <button class="chip" id="musicBtn">random music</button>
   </div>
 
   <div class="viewer" id="viewer" hidden>
@@ -422,6 +450,18 @@
   <audio id="audio" src="music.mp3" loop preload="metadata"></audio>
 
   <script>
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffle(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      }
+      return arr;
+    }
+
     /* bubbles */
     var box = document.getElementById('bubbles');
     for (var i = 0; i < 18; i++) {
@@ -463,6 +503,8 @@
     var audio = document.getElementById('audio');
     var player = document.getElementById('player');
     var playBtn = document.getElementById('playBtn');
+    var trackEl = document.getElementById('track');
+    var coverImg = document.getElementById('coverImg');
     var dragging = false;
 
     function fmt(sec) {
@@ -488,15 +530,14 @@
 
     playBtn.addEventListener('click', function () {
       if (audio.paused) {
-        audio.play().then(function () {
-          player.classList.add('playing');
-        }).catch(function () {});
+        audio.play().catch(function () {});
       } else {
         audio.pause();
-        player.classList.remove('playing');
       }
     });
 
+    audio.addEventListener('play', function () { player.classList.add('playing'); });
+    audio.addEventListener('pause', function () { player.classList.remove('playing'); });
     audio.addEventListener('timeupdate', syncFromAudio);
     audio.addEventListener('loadedmetadata', syncFromAudio);
 
@@ -528,6 +569,117 @@
       syncFromAudio();
     });
 
+    /* random music (Audius) */
+    var musicBtn = document.getElementById('musicBtn');
+    var AUDIUS_HOSTS = ['https://api.audius.co', 'https://discoveryprovider.audius.co'];
+    var AUDIUS_APP = 'texmacros';
+    var GENRES = ['', 'Electronic', 'Pop', 'Hip-Hop/Rap', 'Lo-Fi', 'Rock', 'Jazz', 'Ambient'];
+    var RANGES = ['week', 'month', 'allTime'];
+    var randomMode = false;
+    var musicQueue = [];
+    var musicFails = 0;
+
+    function fetchTrending(host, genre, range) {
+      var url = host + '/v1/tracks/trending?app_name=' + AUDIUS_APP
+        + '&time=' + range + '&limit=50'
+        + (genre ? '&genre=' + encodeURIComponent(genre) : '');
+      return fetch(url)
+        .then(function (r) {
+          if (!r.ok) throw new Error('bad response');
+          return r.json();
+        })
+        .then(function (j) { return j.data || []; });
+    }
+
+    function fetchTrendingAnyHost(genre, range) {
+      var p = Promise.reject();
+      AUDIUS_HOSTS.forEach(function (host) {
+        p = p.catch(function () { return fetchTrending(host, genre, range); });
+      });
+      return p;
+    }
+
+    function cleanTracks(tracks) {
+      return tracks.filter(function (t) {
+        return t && t.id && t.is_streamable !== false && (!t.duration || t.duration < 720);
+      });
+    }
+
+    function loadMusicQueue() {
+      var genre = pickRandom(GENRES);
+      var range = pickRandom(RANGES);
+      return fetchTrendingAnyHost(genre, range)
+        .then(function (tracks) {
+          tracks = cleanTracks(tracks);
+          if (!tracks.length && genre) {
+            return fetchTrendingAnyHost('', range).then(cleanTracks);
+          }
+          return tracks;
+        })
+        .then(function (tracks) {
+          musicQueue = shuffle(tracks);
+        });
+    }
+
+    function setTrackLabel(text, href) {
+      trackEl.textContent = text;
+      if (href) trackEl.href = href; else trackEl.removeAttribute('href');
+      trackEl.hidden = false;
+    }
+
+    function playTrack(t) {
+      randomMode = true;
+      audio.loop = false;
+      audio.src = AUDIUS_HOSTS[0] + '/v1/tracks/' + t.id + '/stream?app_name=' + AUDIUS_APP;
+
+      var art = t.artwork && (t.artwork['480x480'] || t.artwork['150x150'] || t.artwork['1000x1000']);
+      coverImg.style.display = '';
+      coverImg.src = art || 'cover.jpg';
+
+      var artist = t.user && t.user.name ? t.user.name : '';
+      setTrackLabel(t.title + (artist ? ' \u2014 ' + artist : ''),
+                    t.permalink ? 'https://audius.co' + t.permalink : null);
+
+      show(0);
+      timeLeft.textContent = '-:--';
+      return audio.play().catch(function () {});
+    }
+
+    function nextMusic() {
+      musicBtn.disabled = true;
+      musicBtn.textContent = 'loading...';
+
+      var ready = musicQueue.length ? Promise.resolve() : loadMusicQueue();
+      ready.then(function () {
+        if (!musicQueue.length) throw new Error('empty');
+        return playTrack(musicQueue.pop());
+      }).catch(function () {
+        setTrackLabel('Could not load music. Tap "random music" again.', null);
+      }).then(function () {
+        musicBtn.disabled = false;
+        musicBtn.textContent = 'random music';
+      });
+    }
+
+    musicBtn.addEventListener('click', nextMusic);
+
+    audio.addEventListener('ended', function () {
+      if (randomMode) nextMusic();
+    });
+
+    audio.addEventListener('playing', function () { musicFails = 0; });
+
+    audio.addEventListener('error', function () {
+      if (!randomMode) return;
+      musicFails++;
+      if (musicFails < 3) {
+        nextMusic();
+      } else {
+        musicFails = 0;
+        setTrackLabel('Could not play this track. Tap "random music" again.', null);
+      }
+    });
+
     /* random photos */
     var viewer = document.getElementById('viewer');
     var viewerImg = document.getElementById('viewerImg');
@@ -541,14 +693,6 @@
     var currentUrl = null;
     var token = 0;
 
-    function shuffle(arr) {
-      for (var i = arr.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
-      }
-      return arr;
-    }
-
     /* cats */
     function getCat() {
       return fetch('https://api.thecatapi.com/v1/images/search')
@@ -556,6 +700,21 @@
         .then(function (j) { return { url: j[0].url, link: null }; })
         .catch(function () {
           return { url: 'https://cataas.com/cat?t=' + Date.now(), link: null };
+        });
+    }
+
+    /* anime (nekos.best, family-friendly) */
+    function getAnime() {
+      var category = pickRandom(['neko', 'waifu', 'kitsune']);
+      return fetch('https://nekos.best/api/v2/' + category)
+        .then(function (r) {
+          if (!r.ok) throw new Error('bad response');
+          return r.json();
+        })
+        .then(function (j) {
+          var it = j.results && j.results[0];
+          if (!it) throw new Error('empty');
+          return { url: it.url, link: it.source_url || it.artist_href || null };
         });
     }
 
@@ -611,6 +770,12 @@
       });
     }
 
+    function getPhoto(kind) {
+      if (kind === 'cats') return getCat();
+      if (kind === 'anime') return getAnime();
+      return getBabymonster();
+    }
+
     function preload(url) {
       return new Promise(function (resolve, reject) {
         var im = new Image();
@@ -629,8 +794,7 @@
       viewerMsg.hidden = true;
       viewerSrc.hidden = true;
 
-      var source = currentKind === 'cats' ? getCat() : getBabymonster();
-      source.then(function (res) {
+      getPhoto(currentKind).then(function (res) {
         return preload(res.url).then(function () { return res; });
       }).then(function (res) {
         if (my !== token) return;
