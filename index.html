@@ -324,6 +324,8 @@
       background: var(--bg);
       border: 1px solid rgba(var(--accent-rgb), .25);
       box-shadow: 0 8px 32px rgba(0, 0, 0, .45);
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
       animation: fadeUp .25s ease both;
     }
 
@@ -601,9 +603,392 @@
     .exp.active .exp-idle { opacity: 0; transform: scale(.85); }
     .exp.active .exp-show { opacity: 1; transform: none; }
 
+    /* ================================================================
+       page styles: material (default, above), ui/ux, cyberpunk,
+       minimalism, anime. Each one works with all four colors.
+       ================================================================ */
+
+    /* ---------- ui / ux: clean product interface, glass and soft depth ---------- */
+    html[data-style="uiux"] {
+      --bg: #0B0D12;
+      --surface: rgba(255, 255, 255, .06);
+      --surface2: rgba(255, 255, 255, .09);
+      --tile: rgba(255, 255, 255, .05);
+      --text: #F5F7FA;
+      --text2: #A3A9B6;
+      --on-accent: #0B0D12;
+    }
+
+    html[data-style="uiux"] body {
+      font-family: Inter, system-ui, sans-serif;
+      background:
+        radial-gradient(900px 600px at 0% -10%, rgba(var(--accent-rgb), .20), transparent 60%),
+        radial-gradient(800px 500px at 100% 110%, rgba(var(--accent-rgb), .14), transparent 60%),
+        var(--bg);
+    }
+
+    html[data-style="uiux"] .card {
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, .10);
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+
+    html[data-style="uiux"] h1 { font-weight: 700; letter-spacing: -.03em; }
+    html[data-style="uiux"] .meta { font-size: 15px; }
+    html[data-style="uiux"] .avatar { border-radius: 24px; border-color: rgba(255, 255, 255, .12); }
+
+    html[data-style="uiux"] .btn {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, .10);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    html[data-style="uiux"] .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, rgb(var(--accent-rgb)), color-mix(in srgb, rgb(var(--accent-rgb)) 55%, #fff));
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb), .35);
+    }
+
+    html[data-style="uiux"] .exp { border-radius: 18px; border: 1px solid rgba(255, 255, 255, .08); }
+    html[data-style="uiux"] .exp-logo img { border-radius: 22px; }
+
+    html[data-style="uiux"] .panel,
+    html[data-style="uiux"] .lang-menu {
+      border-radius: 18px;
+      background: rgba(18, 20, 27, .88);
+      border-color: rgba(255, 255, 255, .10);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    html[data-style="uiux"] .opt,
+    html[data-style="uiux"] .lang-opt { border-radius: 10px; }
+    html[data-style="uiux"] .lang-btn { border-radius: 12px; border-color: rgba(255, 255, 255, .10); }
+    html[data-style="uiux"] .fab { border-radius: 16px; }
+
+    /* ---------- cyberpunk: neon, sharp corners, scanlines, glitch ---------- */
+    html[data-style="cyber"] {
+      --bg: #07040D;
+      --surface: rgba(10, 6, 20, .86);
+      --surface2: #1A1030;
+      --tile: rgba(var(--accent-rgb), .06);
+      --text: #EAF6FF;
+      --text2: #8FA3B8;
+      --on-accent: #07040D;
+    }
+
+    html[data-style="cyber"][data-theme="purple"] { --accent-rgb: 190,70,255; }
+    html[data-style="cyber"][data-theme="brown"]  { --accent-rgb: 255,140,50; }
+    html[data-style="cyber"][data-theme="teal"]   { --accent-rgb: 0,240,200; }
+    html[data-style="cyber"][data-theme="blue"]   { --accent-rgb: 40,220,255; }
+
+    html[data-style="cyber"] body { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+    html[data-style="cyber"] body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px);
+    }
+
+    html[data-style="cyber"] .card {
+      border-radius: 0;
+      border: 1px solid rgba(var(--accent-rgb), .55);
+      box-shadow: 0 0 28px rgba(var(--accent-rgb), .30), inset 0 0 40px rgba(var(--accent-rgb), .08);
+    }
+
+    html[data-style="cyber"] .card::before,
+    html[data-style="cyber"] .card::after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgb(var(--accent-rgb));
+      pointer-events: none;
+    }
+
+    html[data-style="cyber"] .card::before { top: -6px; left: -6px; border-right: 0; border-bottom: 0; }
+    html[data-style="cyber"] .card::after { right: -6px; bottom: -6px; border-left: 0; border-top: 0; }
+
+    html[data-style="cyber"] h1 {
+      font-family: Orbitron, "JetBrains Mono", monospace;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-shadow: 0 0 12px rgba(var(--accent-rgb), .85);
+      animation: glitch 4s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 90%, 100% { text-shadow: 0 0 12px rgba(var(--accent-rgb), .85); transform: none; }
+      92% { text-shadow: -3px 0 #FF2A6D, 3px 0 #05D9E8; transform: translate(2px, -1px); }
+      94% { text-shadow: 3px 0 #FF2A6D, -3px 0 #05D9E8; transform: translate(-2px, 1px); }
+      96% { text-shadow: -2px 0 #FF2A6D, 2px 0 #05D9E8; transform: none; }
+    }
+
+    html[data-style="cyber"] .meta {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(var(--accent-rgb), .85);
+    }
+
+    html[data-style="cyber"] .avatar {
+      border-radius: 0;
+      border: 2px solid rgb(var(--accent-rgb));
+      box-shadow: 0 0 20px rgba(var(--accent-rgb), .55);
+    }
+
+    html[data-style="cyber"] .btn {
+      border-radius: 0;
+      background: transparent;
+      border: 1px solid rgba(var(--accent-rgb), .7);
+      color: rgb(var(--accent-rgb));
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    html[data-style="cyber"] .btn.primary {
+      background: rgb(var(--accent-rgb));
+      color: var(--on-accent);
+      box-shadow: 0 0 22px rgba(var(--accent-rgb), .6);
+    }
+
+    html[data-style="cyber"] .exp {
+      border-radius: 0;
+      border: 1px dashed rgba(var(--accent-rgb), .45);
+      background: rgba(var(--accent-rgb), .04);
+    }
+
+    html[data-style="cyber"] .exp-title,
+    html[data-style="cyber"] .exp-role {
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    html[data-style="cyber"] .exp-logo img {
+      border-radius: 0;
+      box-shadow: 0 0 0 2px rgb(var(--accent-rgb)), 0 0 24px rgba(var(--accent-rgb), .5);
+    }
+
+    html[data-style="cyber"] .exp-dots i,
+    html[data-style="cyber"] .exp-list li::before { border-radius: 0; }
+
+    html[data-style="cyber"] .panel,
+    html[data-style="cyber"] .lang-menu {
+      border-radius: 0;
+      background: #07040D;
+      border-color: rgba(var(--accent-rgb), .6);
+      box-shadow: 0 0 24px rgba(var(--accent-rgb), .3);
+    }
+
+    html[data-style="cyber"] .p-title { color: rgb(var(--accent-rgb)); }
+
+    html[data-style="cyber"] .opt,
+    html[data-style="cyber"] .lang-opt {
+      border-radius: 0;
+      background: transparent;
+      border: 1px solid rgba(var(--accent-rgb), .3);
+    }
+
+    html[data-style="cyber"] .opt.on,
+    html[data-style="cyber"] .lang-opt.on { background: rgb(var(--accent-rgb)); }
+
+    html[data-style="cyber"] .lang-btn,
+    html[data-style="cyber"] .fab,
+    html[data-style="cyber"] .sw { border-radius: 0; }
+
+    html[data-style="cyber"] .lang-btn { border-color: rgba(var(--accent-rgb), .6); }
+    html[data-style="cyber"] .fab { box-shadow: 0 0 22px rgba(var(--accent-rgb), .6); }
+
+    /* ---------- minimalism: light, quiet, thin lines ---------- */
+    html[data-style="minimal"] {
+      --bg: #F7F7F5;
+      --surface: #FFFFFF;
+      --surface2: #EEEEEC;
+      --tile: #FAFAF9;
+      --text: #111111;
+      --text2: #6B6B6B;
+      --on-accent: #FFFFFF;
+    }
+
+    html[data-style="minimal"][data-theme="purple"] { --accent-rgb: 103,80,164; }
+    html[data-style="minimal"][data-theme="brown"]  { --accent-rgb: 141,85,58; }
+    html[data-style="minimal"][data-theme="teal"]   { --accent-rgb: 0,110,100; }
+    html[data-style="minimal"][data-theme="blue"]   { --accent-rgb: 45,90,190; }
+
+    html[data-style="minimal"] body { font-family: Inter, system-ui, sans-serif; }
+
+    html[data-style="minimal"] .card {
+      border-radius: 8px;
+      border: 1px solid #E6E6E3;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    html[data-style="minimal"] h1 { font-size: 30px; font-weight: 500; letter-spacing: -.02em; }
+    html[data-style="minimal"] .meta { font-size: 15px; }
+    html[data-style="minimal"] .avatar { border-radius: 50%; border: 1px solid #E6E6E3; }
+
+    html[data-style="minimal"] .btn {
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid #DADAD6;
+      font-size: 15px;
+    }
+
+    html[data-style="minimal"] .btn.primary { background: #111; border-color: #111; color: #FFF; }
+
+    html[data-style="minimal"] .exp { border-radius: 8px; border: 1px solid #ECECEA; }
+    html[data-style="minimal"] .exp-logo img { border-radius: 14px; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+
+    html[data-style="minimal"] .panel,
+    html[data-style="minimal"] .lang-menu {
+      border-radius: 10px;
+      background: #FFF;
+      border-color: #E6E6E3;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+    }
+
+    html[data-style="minimal"] .opt,
+    html[data-style="minimal"] .lang-opt { border-radius: 6px; }
+    html[data-style="minimal"] .opt { background: #F2F2F0; }
+
+    html[data-style="minimal"] .opt.on,
+    html[data-style="minimal"] .lang-opt.on,
+    html[data-style="minimal"] .fab { background: #111; color: #FFF; }
+
+    html[data-style="minimal"] .lang-btn { border-radius: 8px; background: #FFF; border-color: #E6E6E3; }
+    html[data-style="minimal"] .fab { border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, .15); }
+    html[data-style="minimal"] .sw.on { border-color: #111; }
+
+    /* ---------- anime: pastel, chunky outlines, sticker shadows, sparkles ---------- */
+    html[data-style="anime"] {
+      --bg: #FFF4FA;
+      --surface: rgba(255, 255, 255, .94);
+      --surface2: #FFE3F1;
+      --tile: #FFFFFF;
+      --text: #2B2340;
+      --text2: #6E6386;
+      --on-accent: #FFFFFF;
+      --ink: #2B2340;
+    }
+
+    html[data-style="anime"][data-theme="purple"] { --accent-rgb: 168,110,255; }
+    html[data-style="anime"][data-theme="brown"]  { --accent-rgb: 240,130,90; }
+    html[data-style="anime"][data-theme="teal"]   { --accent-rgb: 40,190,170; }
+    html[data-style="anime"][data-theme="blue"]   { --accent-rgb: 80,140,255; }
+
+    html[data-style="anime"] body {
+      font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+      background:
+        radial-gradient(rgba(var(--accent-rgb), .20) 2px, transparent 2.5px) 0 0 / 22px 22px,
+        linear-gradient(160deg, #FFF4FA, #F1EDFF);
+    }
+
+    html[data-style="anime"] .card {
+      border: 3px solid var(--ink);
+      border-radius: 28px;
+      box-shadow: 8px 8px 0 rgb(var(--accent-rgb));
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    html[data-style="anime"] .card::before,
+    html[data-style="anime"] .card::after {
+      content: "✦";
+      position: absolute;
+      color: rgb(var(--accent-rgb));
+      pointer-events: none;
+      animation: twinkle 2.4s ease-in-out infinite;
+    }
+
+    html[data-style="anime"] .card::before { top: 14px; left: 20px; font-size: 30px; }
+    html[data-style="anime"] .card::after { top: 46px; right: 26px; font-size: 20px; animation-delay: 1.2s; }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(.6) rotate(45deg); opacity: .5; }
+    }
+
+    html[data-style="anime"] h1 {
+      font-weight: 800;
+      text-shadow: 3px 3px 0 rgba(var(--accent-rgb), .45);
+    }
+
+    html[data-style="anime"] .meta { font-weight: 700; }
+
+    html[data-style="anime"] .avatar {
+      border-radius: 50%;
+      border: 3px solid var(--ink);
+      box-shadow: 5px 5px 0 rgb(var(--accent-rgb));
+    }
+
+    html[data-style="anime"] .btn {
+      border: 2.5px solid var(--ink);
+      background: #FFF;
+      color: var(--ink);
+      font-weight: 700;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    html[data-style="anime"] .btn.primary { background: rgb(var(--accent-rgb)); color: #FFF; }
+
+    html[data-style="anime"] .btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    html[data-style="anime"] .exp {
+      border: 2.5px solid var(--ink);
+      border-radius: 24px;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    html[data-style="anime"] .exp-title { font-weight: 800; }
+    html[data-style="anime"] .exp-logo img { border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 rgb(var(--accent-rgb)); }
+
+    html[data-style="anime"] .panel,
+    html[data-style="anime"] .lang-menu {
+      background: #FFF;
+      border: 2.5px solid var(--ink);
+      box-shadow: 6px 6px 0 rgb(var(--accent-rgb));
+    }
+
+    html[data-style="anime"] .opt {
+      background: #FFF;
+      border: 2px solid var(--ink);
+      font-weight: 700;
+    }
+
+    html[data-style="anime"] .opt.on,
+    html[data-style="anime"] .lang-opt.on { background: rgb(var(--accent-rgb)); color: #FFF; }
+
+    html[data-style="anime"] .lang-btn {
+      background: #FFF;
+      border: 2.5px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    html[data-style="anime"] .fab {
+      color: #FFF;
+      border: 2.5px solid var(--ink);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    html[data-style="anime"] .sw { border: 2.5px solid var(--ink); }
+    html[data-style="anime"] .sw.on { box-shadow: 0 0 0 3px #FFF, 0 0 0 5.5px var(--ink); }
+
     @media (prefers-reduced-motion: reduce) {
       .card, .panel, .lang-menu, .gridlayer, .blob { animation: none; }
       .bubble, .shape { display: none; }
+      html[data-style] h1, html[data-style] .card::before, html[data-style] .card::after { animation: none; }
       .exp-idle, .exp-show, .exp-logo, .exp-logo img, .exp-info, .exp-info-in.in { transition: none; }
     }
   </style>
@@ -667,6 +1052,15 @@
   </button>
 
   <div class="panel" id="panel" hidden>
+    <p class="p-title" data-i18n="style">style</p>
+    <div class="opts" id="styleOpts">
+      <button class="opt" type="button" data-style="material">material you</button>
+      <button class="opt" type="button" data-style="uiux">ui / ux</button>
+      <button class="opt" type="button" data-style="cyber">cyberpunk</button>
+      <button class="opt" type="button" data-style="minimal">minimalism</button>
+      <button class="opt" type="button" data-style="anime">anime</button>
+    </div>
+
     <p class="p-title" data-i18n="bg">background</p>
     <div class="opts" id="bgOpts">
       <button class="opt" type="button" data-mode="bubbles">bubbles</button>
@@ -708,16 +1102,16 @@
     var LANGS = ['en', 'ru', 'uz', 'tr', 'kk', 'ko', 'zh', 'es', 'de', 'fr'];
 
     var I18N = {
-      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   exp: 'work experience', expHint: 'hover and move the cursor', expTap: 'tap or swipe', modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
-      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    exp: 'опыт работы', expHint: 'наведите и ведите курсор', expTap: 'нажмите или проведите', modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
-      uz: { name: 'Özbekça', code: 'UZ', city: 'toşkent',  bg: 'fon',          color: 'rang',    exp: 'iş tajribasi', expHint: 'kursorni olib keling va suring', expTap: 'bosing yoki suring', modes: ['pufakçalar', 'şakllar', 'şafaq', 'tör', 'fonsiz'] },
-      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    exp: 'iş deneyimi', expHint: 'imleci getirip gezdirin', expTap: 'dokunun veya kaydırın', modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
-      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     exp: 'жұмыс тәжірибесі', expHint: 'курсорды апарып, жылжытыңыз', expTap: 'басыңыз немесе сырғытыңыз', modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
-      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    exp: '경력', expHint: '마우스를 올리고 움직여 보세요', expTap: '탭하거나 밀어 보세요', modes: ['거품', '도형', '오로라', '격자', '단색'] },
-      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    exp: '工作经历', expHint: '将鼠标移入并左右移动', expTap: '点击或滑动', modes: ['气泡', '图形', '极光', '网格', '纯色'] },
-      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   exp: 'experiencia laboral', expHint: 'pasa y mueve el cursor', expTap: 'toca o desliza', modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
-      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   exp: 'berufserfahrung', expHint: 'mit der maus darüberfahren', expTap: 'tippen oder wischen', modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
-      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', exp: 'expérience professionnelle', expHint: 'survolez et déplacez le curseur', expTap: 'touchez ou glissez', modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
+      en: { name: 'English',   code: 'EN', city: 'tashkent',  bg: 'background',   color: 'color',   exp: 'work experience', expHint: 'hover and move the cursor', expTap: 'tap or swipe', style: 'style', styles: ['material you', 'ui / ux', 'cyberpunk', 'minimalism', 'anime'], modes: ['bubbles', 'shapes', 'aurora', 'grid', 'plain'] },
+      ru: { name: 'Русский',   code: 'RU', city: 'ташкент',   bg: 'фон',          color: 'цвет',    exp: 'опыт работы', expHint: 'наведите и ведите курсор', expTap: 'нажмите или проведите', style: 'стиль', styles: ['material you', 'ui / ux', 'киберпанк', 'минимализм', 'аниме'], modes: ['пузырьки', 'фигуры', 'аврора', 'сетка', 'без фона'] },
+      uz: { name: 'Özbekça', code: 'UZ', city: 'toşkent',  bg: 'fon',          color: 'rang',    exp: 'iş tajribasi', expHint: 'kursorni olib keling va suring', expTap: 'bosing yoki suring', style: 'uslub', styles: ['material you', 'ui / ux', 'kiberpank', 'minimalizm', 'anime'], modes: ['pufakçalar', 'şakllar', 'şafaq', 'tör', 'fonsiz'] },
+      tr: { name: 'Türkçe',    code: 'TR', city: 'taşkent',   bg: 'arka plan',    color: 'renk',    exp: 'iş deneyimi', expHint: 'imleci getirip gezdirin', expTap: 'dokunun veya kaydırın', style: 'stil', styles: ['material you', 'ui / ux', 'siberpunk', 'minimalizm', 'anime'], modes: ['baloncuklar', 'şekiller', 'aurora', 'ızgara', 'düz'] },
+      kk: { name: 'Қазақша',   code: 'KK', city: 'ташкент',   bg: 'фон',          color: 'түс',     exp: 'жұмыс тәжірибесі', expHint: 'курсорды апарып, жылжытыңыз', expTap: 'басыңыз немесе сырғытыңыз', style: 'стиль', styles: ['material you', 'ui / ux', 'киберпанк', 'минимализм', 'аниме'], modes: ['көпіршіктер', 'пішіндер', 'аврора', 'тор', 'қарапайым'] },
+      ko: { name: '한국어',     code: 'KO', city: '타슈켄트',   bg: '배경',         color: '색상',    exp: '경력', expHint: '마우스를 올리고 움직여 보세요', expTap: '탭하거나 밀어 보세요', style: '스타일', styles: ['material you', 'ui / ux', '사이버펑크', '미니멀리즘', '애니메'], modes: ['거품', '도형', '오로라', '격자', '단색'] },
+      zh: { name: '中文',       code: 'ZH', city: '塔什干',     bg: '背景',         color: '颜色',    exp: '工作经历', expHint: '将鼠标移入并左右移动', expTap: '点击或滑动', style: '风格', styles: ['material you', 'ui / ux', '赛博朋克', '极简', '动漫'], modes: ['气泡', '图形', '极光', '网格', '纯色'] },
+      es: { name: 'Español',   code: 'ES', city: 'taskent',   bg: 'fondo',        color: 'color',   exp: 'experiencia laboral', expHint: 'pasa y mueve el cursor', expTap: 'toca o desliza', style: 'estilo', styles: ['material you', 'ui / ux', 'cyberpunk', 'minimalismo', 'anime'], modes: ['burbujas', 'formas', 'aurora', 'cuadrícula', 'liso'] },
+      de: { name: 'Deutsch',   code: 'DE', city: 'taschkent', bg: 'hintergrund',  color: 'farbe',   exp: 'berufserfahrung', expHint: 'mit der maus darüberfahren', expTap: 'tippen oder wischen', style: 'stil', styles: ['material you', 'ui / ux', 'cyberpunk', 'minimalismus', 'anime'], modes: ['blasen', 'formen', 'aurora', 'raster', 'schlicht'] },
+      fr: { name: 'Français',  code: 'FR', city: 'tachkent',  bg: 'arrière-plan', color: 'couleur', exp: 'expérience professionnelle', expHint: 'survolez et déplacez le curseur', expTap: 'touchez ou glissez', style: 'style', styles: ['material you', 'ui / ux', 'cyberpunk', 'minimalisme', 'anime'], modes: ['bulles', 'formes', 'aurore', 'grille', 'uni'] }
     };
 
     var lang = loadSetting('lang', LANGS, 'en');
@@ -726,6 +1120,15 @@
     /* ---------- background modes ---------- */
     var MODES = ['bubbles', 'shapes', 'aurora', 'grid', 'plain'];
     var THEMES = ['purple', 'brown', 'teal', 'blue'];
+    var STYLES = ['material', 'uiux', 'cyber', 'minimal', 'anime'];
+
+    // fonts are loaded only when a style that needs them is picked
+    var STYLE_FONTS = {
+      uiux: 'Inter:wght@400;500;700',
+      cyber: 'Orbitron:wght@800&family=JetBrains+Mono:wght@400;600',
+      minimal: 'Inter:wght@400;500',
+      anime: 'M+PLUS+Rounded+1c:wght@500;700;800'
+    };
     var bg = document.getElementById('bg');
 
     var SHAPES = [
@@ -796,6 +1199,7 @@
     var panel = document.getElementById('panel');
     var bgOpts = document.getElementById('bgOpts');
     var themeOpts = document.getElementById('themeOpts');
+    var styleOpts = document.getElementById('styleOpts');
     var themeColor = document.getElementById('themeColor');
     var langBtn = document.getElementById('langBtn');
     var langMenu = document.getElementById('langMenu');
@@ -814,12 +1218,35 @@
       setLS('bgmode', mode);
     }
 
+    function updateBarColor() {
+      var c = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if (c) themeColor.setAttribute('content', c);
+    }
+
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       markActive(themeOpts, 'data-pick', theme);
       setLS('theme', theme);
-      var c = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-      if (c) themeColor.setAttribute('content', c);
+      updateBarColor();
+    }
+
+    function loadStyleFont(style) {
+      var family = STYLE_FONTS[style];
+      var id = 'font-' + style;
+      if (!family || document.getElementById(id)) return;
+      var link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=' + family + '&display=swap';
+      document.head.appendChild(link);
+    }
+
+    function setStyle(style) {
+      loadStyleFont(style);
+      document.documentElement.setAttribute('data-style', style);
+      markActive(styleOpts, 'data-style', style);
+      setLS('style', style);
+      updateBarColor();
     }
 
     function closeMenus() {
@@ -842,6 +1269,11 @@
     bgOpts.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-mode]');
       if (btn) setMode(btn.getAttribute('data-mode'));
+    });
+
+    styleOpts.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-style]');
+      if (btn) setStyle(btn.getAttribute('data-style'));
     });
 
     themeOpts.addEventListener('click', function (e) {
@@ -902,6 +1334,10 @@
 
       bgOpts.querySelectorAll('[data-mode]').forEach(function (b) {
         b.textContent = d.modes[MODES.indexOf(b.getAttribute('data-mode'))];
+      });
+
+      styleOpts.querySelectorAll('[data-style]').forEach(function (b) {
+        b.textContent = d.styles[STYLES.indexOf(b.getAttribute('data-style'))];
       });
 
       if (current >= 0) renderJob(false);
@@ -1071,6 +1507,7 @@
 
     /* ---------- start ---------- */
     setTheme(loadSetting('theme', THEMES, 'purple'));
+    setStyle(loadSetting('style', STYLES, 'material'));
     setMode(loadSetting('bgmode', MODES, 'bubbles'));
     buildLangMenu();
     applyLang();
